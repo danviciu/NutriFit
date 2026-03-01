@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NutriFit Wizard - Pasul 4: Analize Sânge</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-mint: #4ade80;
+            --primary-teal: #0d9488;
+            --dark-teal: #064e3b;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top left, #f0fdfa, #ccfbf1);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(13, 148, 136, 0.08);
+        }
+        .progress-gradient {
+            background: linear-gradient(90deg, var(--primary-mint), var(--primary-teal));
+        }
+        .upload-dashed {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='24' ry='24' stroke='%230D9488FF' stroke-width='2' stroke-dasharray='12%2c 16' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+            border-radius: 24px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-6 md:p-12 overflow-x-hidden">
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-teal-100/40 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-emerald-100/40 blur-[120px] rounded-full"></div>
+</div>
+<div class="w-full max-w-3xl">
+<header class="mb-10 text-center">
+<div class="flex items-center justify-center gap-2 mb-6">
+<span class="material-symbols-outlined text-teal-600 text-3xl">biotech</span>
+<span class="text-2xl font-extrabold tracking-tight text-dark-teal">Nutri<span class="text-teal-600">Fit</span></span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end mb-2">
+<span class="text-sm font-semibold text-teal-800 uppercase tracking-wider">Pasul 4 din 4</span>
+<span class="text-sm font-medium text-teal-600 italic">Aproape gata!</span>
+</div>
+<div class="h-2 w-full bg-teal-100 rounded-full overflow-hidden">
+<div class="h-full w-full progress-gradient rounded-full"></div>
+</div>
+</div>
+</header>
+<main class="glass-card rounded-[32px] p-8 md:p-12">
+<div class="max-w-xl mx-auto text-center mb-10">
+<h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Analize Sânge</h1>
+<p class="text-gray-600 leading-relaxed">
+                    Încarcă ultimele tale analize medicale pentru ca AI-ul nostru să îți genereze un plan nutrițional de precizie chirurgicală.
+                </p>
+</div>
+<div class="upload-dashed group relative cursor-pointer transition-all duration-300 hover:bg-teal-50/50 p-12 text-center mb-8">
+<input accept=".pdf,.doc,.docx,.jpg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="file"/>
+<div class="relative z-0">
+<div class="mb-6 inline-flex items-center justify-center w-20 h-20 bg-teal-100 rounded-2xl text-teal-600 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl">upload_file</span>
+</div>
+<h3 class="text-xl font-bold text-gray-800 mb-2">Trage fișierele aici sau apasă pentru selecție</h3>
+<p class="text-sm text-gray-500 mb-4">Se acceptă formate PDF, DOCX sau fotografii clare (JPEG, PNG)</p>
+<div class="flex flex-wrap justify-center gap-3">
+<span class="px-3 py-1 bg-white border border-teal-100 rounded-full text-xs font-medium text-teal-700">Max 10MB</span>
+<span class="px-3 py-1 bg-white border border-teal-100 rounded-full text-xs font-medium text-teal-700">Ultimul an recomandat</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-center gap-6 py-4 border-y border-teal-50 mb-10">
+<div class="flex items-center gap-2 text-teal-800">
+<span class="material-symbols-outlined text-teal-500">verified_user</span>
+<span class="text-xs font-bold uppercase tracking-widest">Medical Security Pro</span>
+</div>
+<div class="w-px h-4 bg-teal-200"></div>
+<div class="flex items-center gap-2 text-gray-500">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span class="text-xs">Datele tale sunt criptate end-to-end</span>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+<button class="w-full sm:w-auto px-8 py-4 text-teal-700 font-semibold hover:bg-teal-50 rounded-2xl transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+                    Pasul anterior
+                </button>
+<button class="w-full sm:w-auto px-10 py-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-teal-200 flex items-center justify-center gap-2">
+                    Finalizează Profilul
+                    <span class="material-symbols-outlined text-lg">check_circle</span>
+</button>
+</div>
+<button class="mt-6 w-full text-center text-sm font-medium text-gray-400 hover:text-teal-600 transition-colors">
+                Nu am analizele acum, voi încărca mai târziu
+            </button>
+</main>
+<footer class="mt-12 text-center">
+<div class="inline-flex items-center gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">health_and_safety</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">HIPAA Compliant</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">security</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">GDPR Ready</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">precision_manufacturing</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">AI Lab Verified</span>
+</div>
+</div>
+</footer>
+</div>
+
+</body></html>

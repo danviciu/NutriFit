@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NutriFit - Dashboard Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Playfair+Display:wght@700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --mint-light: #e0f2f1;
+            --mint-primary: #26a69a;
+            --teal-dark: #004d40;
+            --accent-warm: #ffab91;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #f0fdfa, #ccfbf1, #99f6e4);
+            min-height: 100vh;
+            color: #1a2e2a;
+        }
+        .hero-heading {
+            font-family: 'Playfair Display', serif;
+        }
+        .hex-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cpath fill='%2326a69a' fill-opacity='0.05' d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.91v12.18l10.99 6.34 11-6.34V17.91L14 11.57 3 17.91z'/%3E%3C/svg%3E");
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .ai-companion-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        .ring-chart {
+            transition: stroke-dashoffset 0.6s ease;
+        }
+        .nav-link-active {
+            @apply text-[var(--teal-dark)] font-bold relative;
+        }
+        .nav-link-active::after {
+            content: '';
+            @apply absolute -bottom-1 left-0 w-full h-0.5 bg-[var(--mint-primary)] rounded-full;
+        }
+    </style>
+</head>
+<body class="hex-pattern">
+<nav class="fixed top-0 w-full z-50 bg-white/40 backdrop-blur-md border-b border-white/20">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-[var(--mint-primary)] rounded-xl flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined text-2xl">eco</span>
+</div>
+<span class="text-2xl font-extrabold tracking-tight text-[var(--teal-dark)]">Nutri<span class="text-[var(--mint-primary)]">Fit</span></span>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+<a class="nav-link-active" href="#">Acasă</a>
+<a class="hover:text-[var(--mint-primary)] transition-colors" href="#">Descoperă</a>
+<a class="hover:text-[var(--mint-primary)] transition-colors" href="#">Plan Personalizat</a>
+<a class="hover:text-[var(--mint-primary)] transition-colors" href="#">Progres</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:text-[var(--mint-primary)] transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-[var(--mint-primary)] p-0.5 overflow-hidden cursor-pointer">
+<img alt="Profile" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOXoxRrphlv4wbRp2ofyie-smlLKpC-XDXwwbzVoXhHWdJpPReWziVFwl-5cGTu0lq3SKNmblHMzstZq-O9xDQCMtQ7pN5nTsunt6gdF3wT976KIeph-cScIniyoKQ7lIR7D8_K3wU-TCciI8SgKjfY6IY0bCoBE1jZMDYmiKqmdNLTe6oFdXp4NvGeL1-MDpqg62E-JOJS8T83OxKSmhZVGR3GuSvpra9lyTIdTvRXg4upGCc_irtBbILPmkmAnbIhASzPOQ9Jg"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-28 pb-20 px-6 max-w-7xl mx-auto">
+<section class="relative grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
+<div class="lg:col-span-7 z-10">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 border border-white text-xs font-bold text-[var(--mint-primary)] uppercase tracking-wider mb-6">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+                    Analiză AI Live: Optimizare Metabolica
+                </div>
+<h1 class="hero-heading text-6xl lg:text-7xl leading-tight text-[var(--teal-dark)] mb-6">
+                    Evoluția ta <br/>
+<span class="text-[var(--mint-primary)] italic">începe cu datele.</span>
+</h1>
+<p class="text-xl text-slate-600 leading-relaxed mb-10 max-w-xl">
+                    NutriFit a procesat ultimele tale analize de sânge. Astăzi, focusul nostru este pe restabilirea nivelului de magneziu și optimizarea consumului proteic.
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="px-8 py-4 bg-[var(--teal-dark)] text-white rounded-2xl font-bold shadow-xl shadow-teal-900/20 hover:scale-[1.02] transition-transform">
+                        Vezi Planul de Astăzi
+                    </button>
+<button class="px-8 py-4 bg-white/60 text-[var(--teal-dark)] border border-white/40 rounded-2xl font-bold backdrop-blur-sm hover:bg-white/80 transition-colors">
+                        Încarcă Analize Noi
+                    </button>
+</div>
+</div>
+<div class="lg:col-span-5 relative">
+<div class="ai-companion-float relative z-20 flex justify-center">
+<div class="relative w-72 h-72 bg-gradient-to-br from-[var(--mint-primary)] to-[var(--teal-dark)] rounded-[4rem] flex items-center justify-center shadow-2xl overflow-hidden group">
+<div class="absolute inset-0 opacity-20">
+<svg class="w-full h-full" viewBox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="30" stroke="white" stroke-width="0.5"></circle>
+<circle cx="50" cy="50" fill="none" r="40" stroke="white" stroke-width="0.2"></circle>
+<path d="M20,50 Q50,20 80,50" fill="none" stroke="white" stroke-width="0.5"></path>
+</svg>
+</div>
+<div class="text-white text-center">
+<span class="material-symbols-outlined text-8xl mb-2 opacity-90">auto_awesome</span>
+<div class="text-sm font-bold tracking-widest uppercase opacity-70">Nutri AI</div>
+</div>
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-emerald-300/30 blur-3xl rounded-full"></div>
+<div class="absolute -bottom-10 -left-10 w-40 h-40 bg-teal-500/20 blur-3xl rounded-full"></div>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[var(--mint-primary)]/10 blur-[100px] rounded-full -z-10"></div>
+</div>
+</section>
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+<div class="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between group hover:border-[var(--mint-primary)]/50 transition-colors duration-500">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Metabolism Bazal (BMR)</p>
+<h3 class="text-3xl font-extrabold text-[var(--teal-dark)]">1,840 <span class="text-sm font-normal text-slate-400">kcal</span></h3>
+</div>
+<div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-[var(--mint-primary)]">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+</div>
+<div class="mt-6 flex items-end gap-2">
+<div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-[var(--mint-primary)] rounded-full w-[65%]"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-400">NORMAL</span>
+</div>
+</div>
+<div class="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between group border-2 border-[var(--mint-primary)]/20 shadow-emerald-900/5">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Consum Zilnic (TDEE)</p>
+<h3 class="text-3xl font-extrabold text-[var(--teal-dark)]">2,450 <span class="text-sm font-normal text-slate-400">kcal</span></h3>
+</div>
+<div class="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center text-teal-700">
+<span class="material-symbols-outlined">exercise</span>
+</div>
+</div>
+<div class="mt-6">
+<div class="flex items-center gap-1 text-emerald-600 text-sm font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>+12% față de sapt. trecută</span>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-[2.5rem] p-8 flex items-center gap-6 group">
+<div class="relative w-24 h-24 flex-shrink-0">
+<svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+<circle class="text-slate-100" cx="50" cy="50" fill="transparent" r="42" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-[var(--mint-primary)] ring-chart" cx="50" cy="50" fill="transparent" r="42" stroke="currentColor" stroke-dasharray="263.89" stroke-dashoffset="65" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-lg font-bold text-[var(--teal-dark)]">75%</span>
+</div>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Obiectiv Calorii</p>
+<h3 class="text-2xl font-extrabold text-[var(--teal-dark)]">1,650 / 2,200</h3>
+<p class="text-sm text-slate-500">Rămas: 550 kcal</p>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+<div class="lg:col-span-1">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-[var(--teal-dark)]">Checklist Zilnic</h2>
+<span class="text-xs font-bold text-[var(--mint-primary)] bg-emerald-50 px-3 py-1 rounded-full">3 DIN 5 FINALIZATE</span>
+</div>
+<div class="space-y-4">
+<div class="p-5 glass-card rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-white transition-all">
+<div class="w-6 h-6 rounded-md border-2 border-[var(--mint-primary)] flex items-center justify-center bg-[var(--mint-primary)] text-white">
+<span class="material-symbols-outlined text-xs">check</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-[var(--teal-dark)] line-through opacity-50">Bea 500ml apă (dimineața)</h4>
+<p class="text-[10px] text-slate-400 font-medium">Finalizat la 08:30</p>
+</div>
+</div>
+<div class="p-5 glass-card rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-white transition-all">
+<div class="w-6 h-6 rounded-md border-2 border-[var(--mint-primary)] flex items-center justify-center bg-[var(--mint-primary)] text-white">
+<span class="material-symbols-outlined text-xs">check</span>
+</div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-[var(--teal-dark)] line-through opacity-50">Antrenament de forță (Lower Body)</h4>
+<p class="text-[10px] text-slate-400 font-medium">Finalizat la 10:15</p>
+</div>
+</div>
+<div class="p-5 glass-card rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-white transition-all">
+<div class="w-6 h-6 rounded-md border-2 border-slate-200 group-hover:border-[var(--mint-primary)] transition-colors"></div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-[var(--teal-dark)]">Suplimente: Magneziu &amp; Omega 3</h4>
+<p class="text-[10px] text-[var(--accent-warm)] font-bold">RECOMANDARE AI</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">medication</span>
+</div>
+<div class="p-5 glass-card rounded-2xl flex items-center gap-4 group cursor-pointer hover:bg-white transition-all">
+<div class="w-6 h-6 rounded-md border-2 border-slate-200 group-hover:border-[var(--mint-primary)] transition-colors"></div>
+<div class="flex-1">
+<h4 class="text-sm font-bold text-[var(--teal-dark)]">Loghează Prânzul</h4>
+<p class="text-[10px] text-slate-400 font-medium">Estimare: 650 kcal</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">restaurant</span>
+</div>
+<div class="p-5 glass-card rounded-2xl border-dashed border-2 border-slate-200 bg-transparent flex items-center justify-center gap-2 text-slate-400 font-bold text-sm cursor-pointer hover:border-[var(--mint-primary)] hover:text-[var(--mint-primary)] transition-all">
+<span class="material-symbols-outlined text-base">add</span>
+                        Adaugă task personalizat
+                    </div>
+</div>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-[var(--teal-dark)]">Recomandat pentru tine</h2>
+<a class="text-sm font-bold text-[var(--mint-primary)] flex items-center gap-1 hover:underline" href="#">
+                        Vezi tot <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="group cursor-pointer">
+<div class="relative aspect-[16/10] rounded-[2rem] overflow-hidden mb-4 shadow-lg">
+<img alt="Yoga" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRJR6R1UWINe9D4YtV7qdhBeMSRHxUrkcBp73vRfAuVUGC6xeKApaV-CEUHXgPP4GU_v66C6-T15JWTKxyVWtq8uqYrQPhPGY5Rtl3Tgd3aTBiBG4-CRpNPzYaTkRdZ5fSJ_VSeG1PEmAi_s_nYjfqtHcNdNiCVMdxStqts2ByogJi2Tj699xkrt9bVqcwOaG8fnIaF7gni0nAC_Mkw6NY0pHV4JevN444ozr5G7PQFBp1VT-WKhR5EqyabILTMf9QG0_jntcRQg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-4 left-6">
+<span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-widest border border-white/30">Longevitate</span>
+</div>
+</div>
+<h3 class="text-xl font-bold text-[var(--teal-dark)] leading-snug group-hover:text-[var(--mint-primary)] transition-colors mb-2">Impactul somnului REM asupra regenerării musculare</h3>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 6 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bookmark</span> Salvează</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="relative aspect-[16/10] rounded-[2rem] overflow-hidden mb-4 shadow-lg">
+<img alt="Nutrition" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvOhHe6BOc6rXbhhjaqgm7WqUcXOrS0e089NeB5CNZ64MRqSb5KgNAGHM9ODUIzTA6Hs9iCtcvuBsIIvdK63jcX8hu1IMPc-yU9kRUwF8G_KowxGLvdmXJaSe6dV0oKiiS3jLzos3VV4fn8U9W9lwhgm3Z1FncpVNGK-IOxTy0lUptHI1-wa9VSmPSvnESLHh4htaSWKtudHhM717x13MTfc7LmEca2cXvaXwxZttpEW8EvqugXVuDkgu8D76lBI2_2YrsfGQ_wQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-4 left-6">
+<span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-bold text-white uppercase tracking-widest border border-white/30">Nutriție</span>
+</div>
+</div>
+<h3 class="text-xl font-bold text-[var(--teal-dark)] leading-snug group-hover:text-[var(--mint-primary)] transition-colors mb-2">5 Super-alimente care reduc inflamația sistemică</h3>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 4 min</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">bookmark</span> Salvează</span>
+</div>
+</div>
+</div>
+<div class="mt-10 glass-card rounded-[2.5rem] p-8 bg-gradient-to-r from-[var(--teal-dark)] to-[#00695c] text-white">
+<div class="flex flex-col md:flex-row items-center justify-between gap-8">
+<div>
+<h4 class="text-xl font-bold mb-2">Scorul tău de aderentă: 92%</h4>
+<p class="text-white/70 text-sm max-w-sm">Ești în top 5% dintre utilizatorii NutriFit săptămâna aceasta. Continuă tot așa pentru a debloca noul plan avansat.</p>
+</div>
+<div class="flex -space-x-3">
+<div class="w-12 h-12 rounded-full border-4 border-[var(--teal-dark)] bg-[var(--mint-primary)] flex items-center justify-center font-bold text-xs">L</div>
+<div class="w-12 h-12 rounded-full border-4 border-[var(--teal-dark)] bg-[var(--mint-primary)] flex items-center justify-center font-bold text-xs">M</div>
+<div class="w-12 h-12 rounded-full border-4 border-[var(--teal-dark)] bg-[var(--mint-primary)] flex items-center justify-center font-bold text-xs">M</div>
+<div class="w-12 h-12 rounded-full border-4 border-[var(--teal-dark)] bg-[var(--mint-primary)] flex items-center justify-center font-bold text-xs">J</div>
+<div class="w-12 h-12 rounded-full border-4 border-[var(--teal-dark)] bg-white/20 flex items-center justify-center font-bold text-xs">V</div>
+</div>
+<button class="px-6 py-3 bg-white text-[var(--teal-dark)] rounded-xl font-extrabold text-sm hover:bg-emerald-50 transition-colors">
+                            Vezi Statistici Complete
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="md:hidden fixed bottom-6 left-6 right-6 bg-white/80 backdrop-blur-xl border border-white/40 rounded-3xl p-4 flex items-center justify-around shadow-2xl z-50">
+<button class="text-[var(--mint-primary)]"><span class="material-symbols-outlined">home</span></button>
+<button class="text-slate-400"><span class="material-symbols-outlined">search</span></button>
+<button class="w-12 h-12 bg-[var(--mint-primary)] rounded-full -mt-10 shadow-lg text-white flex items-center justify-center shadow-emerald-200">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="text-slate-400"><span class="material-symbols-outlined">analytics</span></button>
+<button class="text-slate-400"><span class="material-symbols-outlined">person</span></button>
+</div>
+
+</body></html>

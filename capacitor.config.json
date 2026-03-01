@@ -1,0 +1,8 @@
+{
+  "appId": "com.nutrifit.app",
+  "appName": "Nutri Fit MVP",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http"
+  }
+}

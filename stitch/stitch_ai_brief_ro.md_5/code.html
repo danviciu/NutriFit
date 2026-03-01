@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-mint: #4ade80;
+            --primary-teal: #0d9488;
+            --accent-warm: #fbbf24;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --bg-gradient: radial-gradient(circle at top left, #f0fdfa, #f0fdf4, #ffffff);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: #1f2937;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+        }
+        .nav-item-active {
+            color: var(--primary-teal);
+            position: relative;
+        }
+        .nav-item-active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-teal);
+            border-radius: 2px;
+        }
+        .editorial-shadow {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .category-pill {
+            @apply px-6 py-2 rounded-full text-sm font-medium transition-all duration-300;
+        }
+        .category-pill-active {
+            @apply bg-teal-600 text-white shadow-lg shadow-teal-200/50;
+        }
+        .category-pill-inactive {
+            @apply bg-white/60 text-slate-600 border border-slate-100 hover:bg-white hover:shadow-md;
+        }
+    </style>
+</head>
+<body class="antialiased">
+<nav class="sticky top-0 z-50 glass-card border-b border-slate-100 px-8 py-4 mb-8">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined font-bold">nutrition</span>
+</div>
+<span class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-800">NutriFit</span>
+</div>
+<div class="flex items-center gap-10">
+<a class="font-medium text-slate-600 hover:text-teal-600 transition-colors" href="#">Acasă</a>
+<a class="font-medium nav-item-active" href="#">Discover</a>
+<a class="font-medium text-slate-600 hover:text-teal-600 transition-colors" href="#">Plan Personalizat</a>
+<a class="font-medium text-slate-600 hover:text-teal-600 transition-colors" href="#">Progres</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+<img alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZ24py5WUP3hvb8tFDRKfd8USswit1q5o9l5f1HQXLpMepl0QZgl_X7mSLiiB-479BkYJBTaLSfoJObjH15g2ralQ5_owFJ4a4W9n3QdBuEYm9xmvWvKH90auv2xgtk2I8Qg8ykj9fSmeUcXlCvhUTfXmSgeb-fuO2j3h8XXloOlr6iNqRvZD8CBlB6ixpH3T-g-a-qjrnHQ6MjcxrldJosqTZ7cioQegcf9quLPjSx6MjtQzlssuTX7KvwuoZlk1JmLbmV6uZIw"/>
+<div class="text-sm">
+<p class="font-semibold text-slate-800">Marius Dan</p>
+<p class="text-emerald-600 font-medium text-xs">Premium Member</p>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-8 pb-20">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h1 class="text-4xl font-extrabold text-slate-900 mb-2">Descoperă Articole Health-Tech</h1>
+<p class="text-slate-500 max-w-lg">Resurse validate științific și perspective moderne despre nutriție, longevitate și performanță fizică.</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="relative min-w-[320px]">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-12 pr-4 py-3 glass-card rounded-2xl border-none ring-1 ring-slate-200 focus:ring-2 focus:ring-teal-500 outline-none transition-all" placeholder="Caută articole, studii, rețete..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex gap-3 mb-12 overflow-x-auto pb-2 no-scrollbar">
+<button class="category-pill category-pill-active">Toate</button>
+<button class="category-pill category-pill-inactive">Nutriție</button>
+<button class="category-pill category-pill-inactive">Antrenament</button>
+<button class="category-pill category-pill-inactive">Longevitate</button>
+<button class="category-pill category-pill-inactive">Bio-hacking</button>
+<button class="category-pill category-pill-inactive">Analize Medicale</button>
+<button class="category-pill category-pill-inactive">Somn &amp; Recuperare</button>
+</div>
+<section class="mb-16 group cursor-pointer">
+<div class="relative h-[500px] rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500 hover:scale-[1.01]">
+<img alt="Featured Article" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrF-iu8RpE8ngUz1Xgwcjdt75_xK6VHM5pVmp3B05TxFrCGBArEM0oK8eMNjNvaUqdnTj8SnZNDvfWovvOkxN9vJ18-L2g4xq2i_OVjnikVk7XdCm5H55vN4c_sF_QSBukm0dL5ZfS_FhTj20BKd8JFIVA_3EgY87-YWXQOH0Dw4XGChhbmRcz0njm-FilhcLVzXXk7fSvo9_OVdhT9FhnxoPR552JJfG892KWWXqusax96C7WGBC2VnHse4QsuI4nRAMgYAQa-g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12 w-full">
+<div class="flex items-center gap-3 mb-6">
+<span class="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">Editor's Choice</span>
+<span class="text-white/80 text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 12 min citire
+                        </span>
+</div>
+<h2 class="text-5xl font-bold text-white mb-4 max-w-3xl editorial-shadow leading-tight">Impactul analizei metabolice profunde asupra performanței cognitive</h2>
+<p class="text-white/80 text-lg max-w-2xl mb-8 line-clamp-2">Cum pot noile tehnologii de screening sanguin să prezică perioadele de maximă productivitate și să optimizeze dieta pentru claritate mentală.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img alt="Author" class="w-12 h-12 rounded-full border-2 border-white/30 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ9RcsP1K6CdfNH_lif5zqSrI90o_dnCCsgRDNzdBLJWw61iT43NYbveh-whwBQiXDwesMnBIfUCahDBFuxaDLhD0JiTIMw9zJSLqsHQ0IPGCiE5TYF8Kqy4wsNKXmOhR4a77O0Ck5tTEXo1C2Qst2vs-kIwYsUMWBwrB3TSzc4f7cvxJTNbiRFBN5qFdIAGfchadaw0f1TjMrQoOlxh5upxslxSSBmCczwYFaipOnlUiPRVfynWk69djVSJ2QDt9yqAPHZd1rfw"/>
+<div>
+<p class="text-white font-semibold">Dr. Elena Popescu</p>
+<p class="text-white/60 text-xs uppercase tracking-widest font-medium">Nutriționist Specialist</p>
+</div>
+</div>
+<button class="bg-white text-slate-900 px-8 py-4 rounded-2xl font-bold hover:bg-emerald-50 transition-colors shadow-xl">Citește Articolul</button>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<article class="glass-card rounded-[2rem] overflow-hidden group hover:shadow-xl transition-all duration-300">
+<div class="relative h-56 overflow-hidden">
+<img alt="Nutritie" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLQO07CWd7XVMRg3KSR1ClG0NrqK7bHWDGhBGyypemdi6n59IwC9D1SzJUiUbGaQj_byMcSZC6ckWztjPLyFxb7zE1vrE8pQNrOllaMUhk0JPlJBxIFWaK7VjzYcUXySoSoWCTXYk8ADBmYzkRfz35W-abdJOh1jI5TzkjKHinHsGVendTq7XMlHsUKdd5j5bWMphnddmX9AWkGO8Dj-92Tx1dgPrdkaUTOFF_SuJHxOo09VFkrXhvumOjeAC_UhhDbTYT47EVKw"/>
+<div class="absolute top-4 left-4 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-lg text-xs font-bold uppercase">Nutriție</div>
+<button class="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-xl transition-all text-slate-600">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+<div class="p-8">
+<div class="flex items-center gap-2 text-slate-400 text-xs mb-3 font-medium">
+<span class="material-symbols-outlined text-sm">schedule</span> 8 min citire
+                    </div>
+<h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-emerald-700 transition-colors">Proteina vegetală vs. animală: Studiu comparativ 2024</h3>
+<p class="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">Analizăm biodisponibilitatea și profilul de aminoacizi pentru a înțelege cum îți influențează alegerea refacerea musculară după efort.</p>
+<div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+<span class="text-slate-400 text-xs">Acum 2 zile</span>
+<a class="text-teal-600 font-bold text-sm flex items-center gap-1 group/link" href="#">
+                            Citește mai mult
+                            <span class="material-symbols-outlined text-sm transition-transform group-hover/link:translate-x-1">arrow_forward</span>
+</a>
+</div>
+</div>
+</article>
+<article class="glass-card rounded-[2rem] overflow-hidden group hover:shadow-xl transition-all duration-300">
+<div class="relative h-56 overflow-hidden">
+<img alt="Antrenament" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCF4z-LCiWyWCC5Q39MHz1lNL9x37cZd4CBEQo35hR4w2Xntz-ohY1Oo38i3zdIhwf5hN_eaoGVHQVOxD9dm2u_3a0RIsq552yXro-Mkz1s9mZIvAY_dnehFulnHIN0hMblX2dfmTb1gcDC0gZKN50PiEe3VnpUw3KODbruhUPfwrSw_8vRRez4_3RoLkt7tx-hJgo00GqhdhPTAy7YFceUb6r8Lm9ABnA_hoaYLAXTHSQNyrgreafD1Tb5A7spz6csDDNdgLmPKQ"/>
+<div class="absolute top-4 left-4 bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold uppercase">Antrenament</div>
+<button class="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-xl transition-all text-slate-600">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+<div class="p-8">
+<div class="flex items-center gap-2 text-slate-400 text-xs mb-3 font-medium">
+<span class="material-symbols-outlined text-sm">schedule</span> 5 min citire
+                    </div>
+<h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-700 transition-colors">VO2 Max: Indicatorul suprem pentru sănătatea inimii</h3>
+<p class="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">De ce antrenamentul pe intervale de intensitate mare rămâne cea mai eficientă metodă de a-ți îmbunătăți vârsta metabolică.</p>
+<div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+<span class="text-slate-400 text-xs">Acum 5 ore</span>
+<a class="text-teal-600 font-bold text-sm flex items-center gap-1 group/link" href="#">
+                            Citește mai mult
+                            <span class="material-symbols-outlined text-sm transition-transform group-hover/link:translate-x-1">arrow_forward</span>
+</a>
+</div>
+</div>
+</article>
+<article class="glass-card rounded-[2rem] overflow-hidden group hover:shadow-xl transition-all duration-300">
+<div class="relative h-56 overflow-hidden">
+<img alt="Longevitate" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpnYppQYbo3doi08fIa_Gu-OAJw0n_fXUCCFehdsfMSe9fQtuOEpji36zlj0FUv-jUy8slGyK6C_jqRNJ-NyyLgkiIABxfuN0C4lf-OXbOOX9SLE9AOaUBRc-xOrXi95-0Apw3BODOSocMKzUqSaMeQbAgNl66hlJwP73MzHkfIGfuf3cYMrd4zcg9BRv74dJ3JY2aYDVvaHv5wPSPwOnG8avMS3W-faISJZu1j6T1wsWgZz2vKCeCyPBhds6Ivd7ZvABU8Q9gMQ"/>
+<div class="absolute top-4 left-4 bg-amber-50 text-amber-700 px-3 py-1 rounded-lg text-xs font-bold uppercase">Longevitate</div>
+<button class="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-xl transition-all text-slate-600">
+<span class="material-symbols-outlined text-lg">bookmark_border</span>
+</button>
+</div>
+<div class="p-8">
+<div class="flex items-center gap-2 text-slate-400 text-xs mb-3 font-medium">
+<span class="material-symbols-outlined text-sm">schedule</span> 15 min citire
+                    </div>
+<h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-amber-700 transition-colors">Microbiomul și longevitatea: Axa intestin-creier</h3>
+<p class="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">Noi dovezi sugerează că diversitatea bacteriană este direct corelată cu reducerea inflamației sistemice și prelungirea vieții sănătoase.</p>
+<div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+<span class="text-slate-400 text-xs">Acum 1 saptămână</span>
+<a class="text-teal-600 font-bold text-sm flex items-center gap-1 group/link" href="#">
+                            Citește mai mult
+                            <span class="material-symbols-outlined text-sm transition-transform group-hover/link:translate-x-1">arrow_forward</span>
+</a>
+</div>
+</div>
+</article>
+</div>
+<div class="mt-20">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-slate-900">Ultimele Noutăți</h2>
+<button class="text-teal-600 font-semibold hover:underline">Vezi tot fluxul</button>
+</div>
+<div class="space-y-6">
+<div class="glass-card rounded-3xl p-6 flex gap-8 items-center hover:shadow-lg transition-all duration-300 group cursor-pointer">
+<div class="w-40 h-32 rounded-2xl overflow-hidden flex-shrink-0">
+<img alt="Post" class="w-full h-full object-cover transition-transform group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKo0oxHt5P_CS7J_gYtXi9rj0XMGTnPR_qyqUV2QsNUwsvmhoJrauS94Js1FHdKkRRiLs-CrTH0TsJJ0eR0EyIkYEnhGK2L5YC7zs6gkv_HZxASkpCGE0oeOYuzn64UirZhk0Rh4aUBvedwonzg0sMJcV01odbhSA-APmSlUn0TgO-vJ0ydCxXA7M7H8KDtPV0s2yuRWnfPixHAcUYFwawT73T0hdVty-ohGYP1bI1B4g7YILEu115mMVmeVbpNUIsN6NCPjDkig"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-3 mb-2">
+<span class="text-xs font-bold text-teal-600 uppercase">Ghid Practic</span>
+<span class="text-slate-300 text-xs">•</span>
+<span class="text-slate-400 text-xs">10 min citire</span>
+</div>
+<h4 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">Top 10 alimente care scad cortizolul în mod natural</h4>
+<p class="text-slate-500 text-sm line-clamp-2">Cum poți folosi nutriția pentru a gestiona stresul cronic și a-ți îmbunătăți calitatea somnului fără suplimente scumpe.</p>
+</div>
+<div class="flex-shrink-0 flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<div class="glass-card rounded-3xl p-6 flex gap-8 items-center hover:shadow-lg transition-all duration-300 group cursor-pointer">
+<div class="w-40 h-32 rounded-2xl overflow-hidden flex-shrink-0">
+<img alt="Post" class="w-full h-full object-cover transition-transform group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3bMGUActvnrNlltYid9Tc76JAXcCiGtTsDO8JhwqsuRfW1MC3Mh74QC5jMsqKLExPCUEJQyuxoIAPPTl5io3uThpmrcrnBGClTwcTbrPYuUHHN_lgwra1uH_bZROBHIDEKKt893EhoSg5JPjaTsSfVIHs1xX-C1SOOSm2p9UIOixV6x-8upN6TFfhdml3VR2Ht6yUSDQj3oaOh7t7Liev3fJKMuCRyBPzHXGFP981Z-i8wiHBPN9K2t8XY8CVxGuIA2ibulOtBQ"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-3 mb-2">
+<span class="text-xs font-bold text-blue-600 uppercase">Science Watch</span>
+<span class="text-slate-300 text-xs">•</span>
+<span class="text-slate-400 text-xs">15 min citire</span>
+</div>
+<h4 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">Ce spun ultimele analize genetice despre intoleranța la lactoză?</h4>
+<p class="text-slate-500 text-sm line-clamp-2">Descoperă cum profilarea genetică poate elimina incertitudinile din dieta ta și cum poți testa acasă.</p>
+</div>
+<div class="flex-shrink-0 flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all">
+<span class="material-symbols-outlined">bookmark_border</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-8 right-8 z-50">
+<button class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-700 rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform group relative">
+<span class="material-symbols-outlined text-3xl">smart_toy</span>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full border-2 border-white animate-pulse"></span>
+<div class="absolute bottom-20 right-0 glass-card p-4 rounded-2xl shadow-xl w-64 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all pointer-events-none">
+<p class="text-sm font-semibold text-slate-800 mb-1">Salut, sunt asistentul tău NutriFit!</p>
+<p class="text-xs text-slate-500 leading-relaxed">Vrei să găsesc un articol specific pe baza ultimelor tale analize?</p>
+</div>
+</button>
+</div>
+
+</body></html>

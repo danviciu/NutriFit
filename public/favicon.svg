@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NutriFit">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#16a34a" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#g)" />
+  <path d="M44 14c-8 1-15 7-19 14-2 3-2 7-2 10 0 1 1 1 2 1 7 0 14-3 19-8 4-5 7-11 7-17 0 0 0 0-1 0-2 0-4 0-6 0z" fill="#86efac" />
+  <path d="M16 45V20h5l11 15V20h5v25h-5L21 30v15h-5zm27 0V20h5v10h6v5h-6v10h-5z" fill="#fff" />
+</svg>

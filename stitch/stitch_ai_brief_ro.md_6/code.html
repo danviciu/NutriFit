@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NutriFit - Optimizarea Somnului</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --mint-primary: #2DD4BF;
+            --teal-deep: #134E4A;
+            --warm-sun: #FDE68A;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --bg-gradient: linear-gradient(135deg, #F0FDFA 0%, #E0F2FE 100%);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: #1E293B;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+        .parallax-hero {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .nutri-insight-box {
+            background: linear-gradient(145deg, #134E4A 0%, #0F766E 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .nutri-insight-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.1) 0%, transparent 70%);
+        }
+        .prose-custom p {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-size: 1.125rem;
+            color: #334155;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<nav class="fixed top-0 w-full z-50 glass-card border-b border-teal-100">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-[var(--mint-primary)] rounded-xl flex items-center justify-center shadow-lg shadow-teal-200">
+<span class="material-symbols-outlined text-white font-bold">eco</span>
+</div>
+<span class="text-2xl font-extrabold tracking-tight text-[var(--teal-deep)]">NutriFit</span>
+</div>
+<div class="hidden md:flex items-center gap-8 font-medium text-slate-600">
+<a class="hover:text-[var(--mint-primary)] transition-colors" href="#">Acasă</a>
+<a class="text-[var(--mint-primary)] font-semibold" href="#">Discover</a>
+<a class="hover:text-[var(--mint-primary)] transition-colors" href="#">Planul Meu</a>
+<a class="hover:text-[var(--mint-primary)] transition-colors" href="#">Progres</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:text-teal-600 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-[var(--mint-primary)] p-0.5">
+<img alt="Profile" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtBsjCttYFOSz_oEpbwgZtuRlwTzBc_4k5Jjl2lvWceCUrXB80tWzLsza4sDhURkDjNbq9tsYu8yeCPYcYr5jLhkiJ1po4fOlukcaYyDQMDQA19vv3tkfDaHLaUD9zPcuSK1UINKPnO_rMQLMIjWwk35LyWu2W53q0caqDiboUD9fQaB2BoyZh0h4V0QcpqqT7Lf2Lk5FfuELtpxB9YiCFOR5eklGKk9uOwZ8jtfHPOYJXB-edZxb_E1jmIr8_woql1ZQOm6KrTg"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<div class="relative h-[60vh] min-h-[500px] overflow-hidden">
+<div class="absolute inset-0 parallax-hero" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCDsCl7iK8_9czJdOWdAoHHHaQan_XrvaPU7S4G69e6Piu_6lvlKDtzWl9B-cSQT_n5CpUv87QT8BqwBXUKhMH0wD9qZe0HXhpSdRQf8ICmKEwMQFG-tk7xmzwqkT3GkzTtkl3ZzVmhomSugDNnyFnZiEhkfSyyyut4QTRStCysJOxkA19Y0ZUecG_2lGeM0bQH3oRvkZqL63wboNhREUWrT_Ahq9hhBAXBO6RjW75LWNIo-M9Z1ILOm5HDB6w_lJ2eKMqznxpb1g');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-12 lg:p-24">
+<div class="max-w-4xl mx-auto">
+<div class="flex items-center gap-3 mb-6">
+<span class="px-4 py-1.5 bg-[var(--mint-primary)] text-[var(--teal-deep)] text-sm font-bold rounded-full uppercase tracking-wider">Longevitate</span>
+<span class="text-teal-100 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 8 min citire
+                        </span>
+</div>
+<h1 class="text-5xl lg:text-7xl font-extrabold text-white mb-6 leading-tight">
+                        Arta Somnului Profund: Optimizarea pentru Performanță
+                    </h1>
+<p class="text-xl text-teal-50/80 max-w-2xl font-light leading-relaxed">
+                        Descoperă cum biohacking-ul somnului îți poate reseta metabolismul și îmbunătăți claritatea mentală folosind datele tale biologice.
+                    </p>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-12 gap-16">
+<div class="lg:col-span-8">
+<div class="glass-card rounded-3xl p-8 mb-12 border-l-4 border-l-[var(--mint-primary)]">
+<h3 class="text-xl font-bold text-[var(--teal-deep)] mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[var(--mint-primary)]">lightbulb</span>
+                        Idei Principale
+                    </h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[var(--mint-primary)] mt-1">check_circle</span>
+<span class="text-slate-700">Somnul REM este crucial pentru consolidarea memoriei și reglarea emoțională.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[var(--mint-primary)] mt-1">check_circle</span>
+<span class="text-slate-700">Expunerea la lumina albastră după ora 20:00 inhibă producția naturală de melatonină.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[var(--mint-primary)] mt-1">check_circle</span>
+<span class="text-slate-700">Temperatura optimă a camerei pentru un somn neîntrerupt este de 18.5°C.</span>
+</li>
+</ul>
+</div>
+<article class="prose-custom">
+<p class="text-2xl font-medium text-slate-900 leading-snug mb-10">
+                        Somnul nu este doar o perioadă de repaus, ci o stare metabolică activă în care corpul tău efectuează operațiuni critice de mentenanță.
+                    </p>
+<p>
+                        Studiile recente arată că privarea de somn afectează sensibilitatea la insulină la fel de sever ca o dietă bogată în zaharuri procesate. Pentru utilizatorii NutriFit, optimizarea ferestrei de odihnă este pilonul central al oricărui plan de fitness eficient.
+                    </p>
+<h2 class="text-3xl font-bold text-[var(--teal-deep)] mt-12 mb-6 italic">Ritmul Circadian și Nutriția</h2>
+<p>
+                        Există o legătură directă între analizele tale de sange (în special nivelul de cortizol matinal) și calitatea odihnei. Dacă nivelul tău de magneziu este scăzut, sistemul nervos rămâne într-o stare de alertă, împiedicând tranziția către somnul profund.
+                    </p>
+<div class="my-12 rounded-3xl overflow-hidden shadow-2xl">
+<img alt="Circadian Rhythm" class="w-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-b5gd9sEC4j7ik4bxVzWDE5a6F7kyTdOu1l7Oq4o3tSJc4AWIHKKdRk4Oj3q933WS1Yk6uDH1KVczQoL8VM0o8G_BSU39PILzdHWdSkwnOkCZ7Ok8yfV9VUKkgLlg1YY-Msf6kJRL-nFU_P9jR70qtkVUJEMUf0kxwF_a1kzu2yGwvhn9t5DfgAAPMAv_k2rPxSQpngCCOXatn0UGv8H6axmp0Jtt_WwfScijy7FNEaamWpgrk2vAt8JovkOed-NDALvSBysfMA"/>
+</div>
+<p>
+                        Recomandăm implementarea unei „ferestre de deconectare” cu cel puțin 90 de minute înainte de culcare. Aceasta include limitarea consumului de calorii și evitarea antrenamentelor de intensitate ridicată care pot crește temperatura corporală centrală.
+                    </p>
+</article>
+<div class="mt-16 pt-8 border-t border-slate-200 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-slate-200 hover:border-teal-400 transition-all text-slate-600">
+<span class="material-symbols-outlined text-xl">favorite</span>
+<span>421</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-slate-200 hover:border-teal-400 transition-all text-slate-600">
+<span class="material-symbols-outlined text-xl">bookmark</span>
+<span>Salvează</span>
+</button>
+</div>
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-teal-50 hover:text-teal-600 transition-all">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 space-y-8">
+<div class="nutri-insight-box rounded-[2rem] p-8 text-white shadow-xl">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 bg-[var(--mint-primary)]/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[var(--warm-sun)]">smart_toy</span>
+</div>
+<div>
+<h4 class="font-bold text-lg leading-none">Nutri Insights</h4>
+<span class="text-teal-200 text-xs font-medium uppercase tracking-widest">AI Summary</span>
+</div>
+</div>
+<p class="text-teal-50/90 text-sm leading-relaxed mb-6 italic">
+                        "Bazat pe profilul tău, optimizarea somnului ar putea îmbunătăți recuperarea musculară cu până la 15%. Analizele tale indică un nivel de zinc la limita inferioară, ceea ce poate afecta calitatea melatoninei."
+                    </p>
+<div class="space-y-4">
+<div class="p-4 bg-white/10 rounded-2xl border border-white/10">
+<span class="text-xs text-teal-300 font-bold block mb-1">RECOMANDARE PERSONALIZATĂ</span>
+<p class="text-sm font-medium">Consumă 30g de migdale cu 2 ore înainte de culcare.</p>
+</div>
+</div>
+<button class="w-full mt-6 py-3 bg-[var(--warm-sun)] text-[var(--teal-deep)] font-bold rounded-xl shadow-lg hover:brightness-105 transition-all flex items-center justify-center gap-2">
+                        Adaugă în planul meu
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="glass-card rounded-3xl p-6">
+<h5 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4">Autor</h5>
+<div class="flex items-center gap-4">
+<img alt="Dr. Maria Ionescu" class="w-14 h-14 rounded-2xl object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr3WYzIN7bGEUuHTK9yuDPLtD0Qj845d1qLJXZ6SllebXs97c4_22hpSBIfu7I1Arjc2ISrjnhLEkt441YCquvp-a0VyxFNBSm-0p6bYHtZxQJs-r8tf7OSvRY2Kc26o7NhaSPq470P5kABiN8UjFlKzkZInRSK9m30hio8z9VH3AmGJNIPtRydXOMLDJhKMnm4irHsh17YuudKgbv59wRpn1J_Sm8dYD9qTYJeG9JBuBgMqwEaH5VPCY5-f10356d3qgRW7zp_g"/>
+<div>
+<h4 class="font-bold text-[var(--teal-deep)]">Dr. Maria Ionescu</h4>
+<p class="text-xs text-slate-500">Specialist Nutriție &amp; Neurobiologie</p>
+</div>
+</div>
+</div>
+<div class="bg-gradient-to-br from-teal-50 to-white rounded-3xl p-8 border border-teal-100">
+<h4 class="font-extrabold text-[var(--teal-deep)] mb-2">Vrei mai multe insight-uri?</h4>
+<p class="text-sm text-slate-600 mb-6">Primește săptămânal cele mai noi cercetări adaptate profilului tău.</p>
+<div class="space-y-3">
+<input class="w-full px-4 py-3 rounded-xl border-slate-200 focus:ring-[var(--mint-primary)] focus:border-[var(--mint-primary)] text-sm" placeholder="email@exemplu.ro" type="email"/>
+<button class="w-full py-3 bg-[var(--teal-deep)] text-white font-bold rounded-xl hover:bg-teal-800 transition-colors">Abonează-te</button>
+</div>
+</div>
+</div>
+</div>
+<section class="bg-slate-50/50 py-24 border-t border-slate-200">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex items-end justify-between mb-12">
+<div>
+<h2 class="text-3xl font-extrabold text-[var(--teal-deep)]">Articole Similare</h2>
+<p class="text-slate-500">Continuă să înveți despre sănătatea ta</p>
+</div>
+<a class="text-[var(--mint-primary)] font-bold flex items-center gap-2 hover:gap-3 transition-all" href="#">
+                        Vezi tot catalogul <span class="material-symbols-outlined">arrow_right_alt</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="group cursor-pointer">
+<div class="relative h-64 rounded-3xl overflow-hidden mb-6">
+<img alt="Yoga article" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7NTtIGud44DJG6F__IhSahG-mkWRjB-40zXQ4sOvkRjylWru4j-IXTL2e3n3YscxTs-hlrFF1aoUE1x9EbaPl0coRDWZId6XuMXoYlffhZRohW74KdnplyVznY-1rbwEuHNQ47sh3KII4FwdESzKocyVvjB6PhS0oifDFR-JQEN3F7FnxI3q0KN-kl5UMCN3Z_ZExSQ852t2_iflHnZStTNoOZS6AgghgZ-ZfHdDabKZ_0e7oJ7L4lqM6dYt-YPPUmLT5hJsu1A"/>
+<div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-bold text-[var(--teal-deep)]">Fitness</div>
+</div>
+<h3 class="text-xl font-bold text-slate-900 group-hover:text-[var(--mint-primary)] transition-colors mb-2">Impactul Cortizolului asupra Greutății</h3>
+<p class="text-slate-500 text-sm line-clamp-2">Află cum stresul cronic poate sabota obiectivele tale de slăbire în ciuda unei diete corecte.</p>
+</div>
+<div class="group cursor-pointer">
+<div class="relative h-64 rounded-3xl overflow-hidden mb-6">
+<img alt="Nutrition article" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWhHlglU2tjKCv7IDPXWHy05fL-hVPUs3g64qRT70AelrQmURicfSg5ibVDtlHBSGT6Ar5jwpSFfLumz2UT5mBBg7prBIjh5JnVXfURp25t_R8F3-X9aqFM8SCvwbCRFqvQhtrXZ4iPzwxeAXe4VY4UGVExWBJucx3HD-TmT59jC_x088PqE3fxwMmqdJx3hHxcQYVzpNPHhDW3LlFO5DiZ5HOCTIWWxpB-ShtaTHH9b3TjfGHC7QEqyoixPL9turL6k0kKXzbzg"/>
+<div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-bold text-[var(--teal-deep)]">Nutriție</div>
+</div>
+<h3 class="text-xl font-bold text-slate-900 group-hover:text-[var(--mint-primary)] transition-colors mb-2">Top 5 Super-alimente pentru Energie</h3>
+<p class="text-slate-500 text-sm line-clamp-2">Include aceste alimente în dieta ta zilnică pentru a combate oboseala de la prânz.</p>
+</div>
+<div class="group cursor-pointer">
+<div class="relative h-64 rounded-3xl overflow-hidden mb-6">
+<img alt="Lifestyle article" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaJ8W-HYNcfuM1R2FqnWW9UlbjtydJHtmLnZUbe7GHboSAydOrdiJbc0cQgF-vcnlUwXG0McuQ2KcWEj_OarRbzOnre_Xf17JNwRkJARz50FYTXA4cs8BQn5Q4yDVNHn-pKT7xWvQDIU8h0qSZ2SfAEDMsm-0dnlAjj6CpAtnpeN2Nz9540wC57AZrAbxd6WA5TFoKiCJdNMbtvDXdVVrZuGK23UfgV_evxGTYIexpaWleC0JzQ1phxRVCKvi8QnqREG84zXnErw"/>
+<div class="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-bold text-[var(--teal-deep)]">Mental</div>
+</div>
+<h3 class="text-xl font-bold text-slate-900 group-hover:text-[var(--mint-primary)] transition-colors mb-2">Meditația și Neuroplasticitatea</h3>
+<p class="text-slate-500 text-sm line-clamp-2">Cum 10 minute pe zi pot schimba structura creierului tău pentru o mai bună concentrare.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-[var(--teal-deep)] text-white py-16">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+<div class="col-span-1 md:col-span-1">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-8 h-8 bg-[var(--mint-primary)] rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">eco</span>
+</div>
+<span class="text-xl font-bold tracking-tight">NutriFit</span>
+</div>
+<p class="text-teal-100/60 text-sm leading-relaxed">
+                        Sănătate personalizată prin inteligență artificială și bio-analize. Drumul tău către o versiune mai bună.
+                    </p>
+</div>
+<div>
+<h5 class="font-bold mb-6">Produs</h5>
+<ul class="space-y-4 text-sm text-teal-100/60">
+<li><a class="hover:text-white transition-colors" href="#">Plan Personalizat</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Monitorizare Progres</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Discover</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6">Comunitate</h5>
+<ul class="space-y-4 text-sm text-teal-100/60">
+<li><a class="hover:text-white transition-colors" href="#">Blog</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Povești de succes</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Referal Program</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6">Legal</h5>
+<ul class="space-y-4 text-sm text-teal-100/60">
+<li><a class="hover:text-white transition-colors" href="#">Termeni și Condiții</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Politică de Confidențialitate</a></li>
+<li><a class="hover:text-white transition-colors" href="#">Medical Disclaimer</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-8 border-t border-white/10 flex flex-col md:row items-center justify-between gap-4 text-teal-100/40 text-xs">
+<p>© 2024 NutriFit AI. Toate drepturile rezervate.</p>
+<div class="flex gap-6">
+<a class="hover:text-white" href="#">Instagram</a>
+<a class="hover:text-white" href="#">LinkedIn</a>
+<a class="hover:text-white" href="#">Twitter</a>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>

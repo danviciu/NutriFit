@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Autentificare NutriFit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-mint: #4ade80;
+            --primary-teal: #0d9488;
+            --accent-warm: #fbbf24;
+            --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #e6fffa 100%);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .biotech-bg {
+            background-image: radial-gradient(circle at 20% 30%, rgba(74, 222, 128, 0.1) 0%, transparent 40%),
+                              radial-gradient(circle at 80% 70%, rgba(13, 148, 136, 0.1) 0%, transparent 40%);
+        }
+        .premium-input {
+            @apply w-full px-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[var(--primary-mint)] focus:border-transparent transition-all outline-none text-slate-700 placeholder-slate-400;
+        }
+        .social-btn {
+            @apply flex items-center justify-center gap-3 w-full py-3 px-4 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-all font-medium text-slate-700;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center biotech-bg">
+<div class="flex flex-col lg:flex-row w-full h-screen overflow-hidden">
+<div class="hidden lg:flex lg:w-1/2 relative flex-col justify-center px-20 bg-[var(--primary-teal)] overflow-hidden">
+<div class="absolute inset-0 opacity-20">
+<div class="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-[var(--primary-mint)] blur-3xl"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full bg-[var(--accent-warm)] blur-3xl"></div>
+<svg class="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 100 100">
+<pattern height="10" id="grid" patternUnits="userSpaceOnUse" width="10">
+<path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.1"></path>
+</pattern>
+<rect fill="url(#grid)" height="100" width="100"></rect>
+</svg>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-12">
+<div class="w-10 h-10 rounded-lg bg-[var(--primary-mint)] flex items-center justify-center shadow-lg shadow-emerald-500/20">
+<span class="material-symbols-outlined text-white">vital_signs</span>
+</div>
+<span class="text-2xl font-bold text-white tracking-tight">NutriFit</span>
+</div>
+<h1 class="text-5xl font-extrabold text-white leading-tight mb-8">
+                    Puterea datelor tale <br/>
+<span class="text-[var(--primary-mint)]">transformată în vitalitate.</span>
+</h1>
+<div class="flex items-start gap-4 max-w-lg">
+<span class="material-symbols-outlined text-[var(--accent-warm)] text-3xl">format_quote</span>
+<p class="text-xl text-emerald-50/80 font-light leading-relaxed italic">
+                        "Sănătatea nu este doar despre ce mănânci. Este despre cum utilizezi biologia corpului tău pentru a atinge potențialul maxim. NutriFit a făcut din datele mele de sânge o hartă clară spre succes."
+                    </p>
+</div>
+<div class="mt-12 flex items-center gap-4">
+<div class="flex -space-x-3">
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-[var(--primary-teal)] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDWK7ijrmc5vVZONKGsQkHsOoV9MBv77FCGK22QuiO4-8kEX-3_8ip8AcIh4W-pP6KTw0p1q5sGcaPUQjnFbXVWuodCAba1SJhEnNh42fL8uNyATWMRMkFtE42YzpuEoG7Q0ZsjfRaulZb4TJzvnnDbJD8ES9GRKLGxAut05rs-Fh9pgg1eZ2rx2RtWJiMcD-J9ucu1Nkanb6CmzYc8roUdO2MZ3I-K_CApZZdXX3qmrx6AvyflVMfkWhD7IYVIYKQOL5gTGl1Fw"/>
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-[var(--primary-teal)] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHpCdaqTpVyk6Gnyyve1rn8Fp8UKLeZyO9NyKNj9slc7pWEeD7_tQ8WSt22RrlnQxqQueWxO7ELftnZ7CBqopO2cfDYxmObLeNIt7mVToGmCkRmMf4t39LeFdLeJtWQtXB3GGukI7m_dq1kzYf8aft-ylzuaUeOxyldGpF9lGxfloJ8zCdvtJJ8sSf82pfByRLROfTfbj6TmJK9jl0tn_3r1QwPQFQnGknlQ30jC6-yavaKgnKovybNPQ_q4sfrFUZyNgvmTcWFg"/>
+<img alt="User" class="w-10 h-10 rounded-full border-2 border-[var(--primary-teal)] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByf9JrvmJ9_NiUn2R3G3MuJmR8y5uUC3FdM_zdg1mxyL2XqrNr4WtL-bNA1u6xRE30ArjSSn2O3nSa03O75vQXMxbk0DYvARNmxdh7zfOJ0_WPsLiYUoO6u6czoZPcJwSIPlVh-8pN3tpG6MyVyOy2aFDV8DY2BokeurZyw0V5Aj2CQb28PXn1RoMuWYfeZSBy2f19tRfCUauceaTbFv0tmbPB5KZxAAcOePfCEuOXXRkSk84pbmccYaLD3WDUqxxTRznr3XcP5Q"/>
+</div>
+<span class="text-emerald-50/70 text-sm font-medium">+2,400 utilizatori activi azi</span>
+</div>
+</div>
+</div>
+<div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-slate-50">
+<div class="w-full max-w-md">
+<div class="lg:hidden flex justify-center mb-8">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 rounded-lg bg-[var(--primary-teal)] flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white">vital_signs</span>
+</div>
+<span class="text-2xl font-bold text-slate-800 tracking-tight">NutriFit</span>
+</div>
+</div>
+<div class="glass-card p-8 sm:p-10 rounded-3xl shadow-2xl shadow-slate-200/50">
+<div class="mb-10 text-center lg:text-left">
+<h2 class="text-3xl font-bold text-slate-800 mb-2">Bine ai revenit</h2>
+<p class="text-slate-500">Introdu datele pentru a accesa planul tău personalizat.</p>
+</div>
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 ml-1">Adresa de email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">mail</span>
+<input class="premium-input pl-12" placeholder="nume@exemplu.com" required="" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center ml-1">
+<label class="text-sm font-semibold text-slate-700">Parola</label>
+<a class="text-sm font-medium text-[var(--primary-teal)] hover:text-emerald-700 transition-colors" href="#">Ai uitat parola?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">lock</span>
+<input class="premium-input pl-12" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="flex items-center gap-2 ml-1">
+<input class="w-4 h-4 text-[var(--primary-teal)] border-slate-300 rounded focus:ring-[var(--primary-teal)]" id="remember" type="checkbox"/>
+<label class="text-sm text-slate-600" for="remember">Rămâi conectat</label>
+</div>
+<button class="w-full py-4 bg-[var(--primary-teal)] hover:bg-[#0b7a6f] text-white font-bold rounded-xl shadow-lg shadow-emerald-900/10 transition-all transform active:scale-[0.98]" type="submit">
+                            Intră în cont
+                        </button>
+</form>
+<div class="relative my-8">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-slate-200"></div>
+</div>
+<div class="relative flex justify-center text-sm">
+<span class="px-4 bg-white text-slate-500">sau continuă cu</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="social-btn">
+<img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwoA51IXal6XzZi9Gk34BrVL-mTqRxXhYkV-yHOgPRXzvVQ2uCHgKcv3k0WZHcyJc8fYRPxs-xT52GsKKp1MQti0fgH-5cFWHsIK938JqTKjOFstsOgR0v_F0-Z_HmK3bNVkDMxBnLPZw006o4vbSJ3ko3r_i4FPU2IfvVeR4z9-_RBMV4NWISuKZwRcXHLxu_W8ePJ17A61XvSiCB7H9SlCrN-F7Z8p_dDRvyTJaoZOx1CHF098sOLmCqlriFAaLVs1uqeUhFZw"/>
+<span>Google</span>
+</button>
+<button class="social-btn">
+<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 384 512">
+<path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"></path>
+</svg>
+<span>Apple</span>
+</button>
+</div>
+<p class="mt-10 text-center text-slate-500 text-sm">
+                        Nu ai un cont? 
+                        <a class="font-bold text-[var(--primary-teal)] hover:underline ml-1" href="#">Creează unul acum</a>
+</p>
+</div>
+<div class="mt-8 flex justify-center gap-6 text-xs text-slate-400">
+<a class="hover:text-slate-600 transition-colors" href="#">Termeni și condiții</a>
+<a class="hover:text-slate-600 transition-colors" href="#">Politica de confidențialitate</a>
+<a class="hover:text-slate-600 transition-colors" href="#">Suport</a>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

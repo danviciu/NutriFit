@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NutriFit - Plan Personalizat Nutriție</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --mint-primary: #4ade80;
+            --teal-dark: #0f766e;
+            --teal-glow: #2dd4bf;
+            --warm-accent: #fbbf24;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, #064e3b, #022c22, #000000);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+        }
+        .glass-card-active {
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+        .progress-rail {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .nav-blur {
+            background: rgba(2, 44, 34, 0.8);
+            backdrop-filter: blur(8px);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #4ade80 0%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meal-thumb {
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(74, 222, 128, 0.3);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-emerald-500/30">
+<aside class="fixed left-0 top-0 h-full w-20 lg:w-64 border-r border-white/5 nav-blur z-50 transition-all">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+<span class="material-symbols-outlined text-white">bolt</span>
+</div>
+<span class="hidden lg:block text-xl font-bold tracking-tight text-white">Nutri<span class="text-emerald-400">Fit</span></span>
+</div>
+<nav class="mt-8 px-4 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="hidden lg:block font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" href="#">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="hidden lg:block font-medium">Plan Personalizat</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="hidden lg:block font-medium">Progres</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="hidden lg:block font-medium">Discover</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="hidden lg:block font-medium">Notificări</span>
+</a>
+</nav>
+<div class="absolute bottom-8 px-8 w-full">
+<div class="lg:flex items-center gap-3 hidden">
+<img alt="Avatar" class="w-10 h-10 rounded-full border-2 border-emerald-500/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyLQoZmzwjFhCIs4wg_x-bwVZiM4UnyC_qh3H6-OBpS4yEv9wvHNSWxVlu1s8VdDMRC-iNCT0ZFD_hKuo2Z3tDQXvTmGe7UsMF629hN160iBV6NLrEk7RZ3VScGHxHmhD-mUk4SC1Gh3c-tf1jvXJOPwp06GdJY0sNYEzUcVkNll51NADBT_ndd6LLK5I9YUrbRRWG-0e7l-BH8FvIQq3aL2wbO3ET8fZFuna-DpVvh49ilW1y1izTcEDdhzDanb1SNYo3KTrE7Q"/>
+<div>
+<p class="text-sm font-semibold text-white">Alex Ionescu</p>
+<p class="text-xs text-gray-400">Pro Member</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="ml-20 lg:ml-64 p-8 min-h-screen">
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+<div>
+<h1 class="text-3xl lg:text-4xl font-extrabold text-white mb-2 tracking-tight">Plan Personalizat <span class="text-gradient">Nutriție</span></h1>
+<p class="text-gray-400 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-emerald-400">check_circle</span>
+                    Bazat pe analizele tale de sânge din 12 Mai 2024
+                </p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-semibold flex items-center gap-2 hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                    Export PDF
+                </button>
+<button class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition-transform">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+                    Ajustează cu AI
+                </button>
+</div>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+<div class="glass-card p-6 border-l-4 border-l-emerald-400">
+<p class="text-gray-400 text-sm font-medium mb-1">Țintă Calorică</p>
+<div class="flex items-end gap-2">
+<span class="text-2xl font-bold text-white">2,150</span>
+<span class="text-emerald-400 text-sm mb-1">kcal / zi</span>
+</div>
+</div>
+<div class="glass-card p-6 border-l-4 border-l-teal-400">
+<p class="text-gray-400 text-sm font-medium mb-1">BMR Estimativ</p>
+<div class="flex items-end gap-2">
+<span class="text-2xl font-bold text-white">1,840</span>
+<span class="text-teal-400 text-sm mb-1">kcal</span>
+</div>
+</div>
+<div class="glass-card p-6 border-l-4 border-l-emerald-500">
+<p class="text-gray-400 text-sm font-medium mb-1">Status Metabolic</p>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-white uppercase tracking-wider text-sm">Optimizat</span>
+<span class="material-symbols-outlined text-emerald-400">trending_up</span>
+</div>
+</div>
+<div class="glass-card p-6 border-l-4 border-l-warm-accent">
+<p class="text-gray-400 text-sm font-medium mb-1">Hidratare Recomandată</p>
+<div class="flex items-end gap-2">
+<span class="text-2xl font-bold text-white">3.2</span>
+<span class="text-warm-accent text-sm mb-1">Litri</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 mb-8 bg-white/5 p-1.5 rounded-2xl w-fit overflow-x-auto no-scrollbar">
+<button class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white">Rezumat</button>
+<button class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white">Analize</button>
+<button class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">Alimentație</button>
+<button class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white">Fitness</button>
+<button class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white">Cumpărături</button>
+</div>
+<div class="space-y-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold text-white">Meniul de Astăzi <span class="text-emerald-400 font-medium ml-2">— Luni, 15 Mai</span></h2>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full glass-card hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="flex gap-6 overflow-x-auto pb-6 custom-scrollbar snap-x">
+<div class="min-w-[320px] md:min-w-[380px] snap-start">
+<div class="glass-card-active p-5 group cursor-pointer transition-all hover:scale-[1.01]">
+<div class="relative mb-4">
+<img alt="Mic Dejun" class="meal-thumb w-full shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBht5QcDabN57Bn6RZe-XMPsgU9EwQyjNf2IxVMckxrLTi1OHjz_fmajohsnBwBvwhIhxJVwsX43cswLxLHJx4EAR6AGFc_rTKZA02NzCHBIJPzUeV10COwkg5M23U_VIHgyCiYGKvsfzxyOAvQRvDjxcP5fdS8rfgkyISgp0tWhCcrtjsw2ZTq-qFgIziRG1p2N-v8P6n3hUos2MjBsdCzVMsUbPZK6uIXU7jYnVHsqAWIWIOku2H_yt-QfPZUd94WYli0m_0Y_A"/>
+<div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-widest">Mic Dejun</div>
+<div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-sm">info</span>
+</div>
+</div>
+<h3 class="text-lg font-bold text-white mb-1">Ochiuri cu Avocado și Toast</h3>
+<p class="text-sm text-gray-400 mb-4 line-clamp-1">Ouă bio, avocado, pâine integrală, semințe de in</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-emerald-400 uppercase tracking-tighter">Proteine</span>
+<span class="text-white">24g / 35g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-emerald-400" style="width: 68%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-teal-400 uppercase tracking-tighter">Carbohidrați</span>
+<span class="text-white">32g / 40g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-teal-400" style="width: 80%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-warm-accent uppercase tracking-tighter">Grăsimi</span>
+<span class="text-white">18g / 22g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-warm-accent" style="width: 82%"></div></div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+<span class="text-lg font-bold text-white">450 <span class="text-xs text-gray-500 font-normal">kcal</span></span>
+<button class="text-emerald-400 text-sm font-bold flex items-center gap-1 hover:underline">
+                                Detalii Rețetă <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="min-w-[320px] md:min-w-[380px] snap-start">
+<div class="glass-card p-5 group cursor-pointer transition-all hover:scale-[1.01]">
+<div class="relative mb-4">
+<img alt="Pranz" class="meal-thumb w-full opacity-90 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMkJ0M8NZumfE7Iitc15mwr0nBkOpGxsDK4APFG5tLXIBHeCERaBBDHXDdc9-CY7j1GcNMS__Hc7i9ie70D0aCdyAyKfbROJ43074-N1HjeNamA-9ihRNOs8dUFmJZ8yt7vCgOOt34ku-JeaRqrtfm6VnWt7sjbI0K2tF6D5kRRjAiV82pk55tijfMeJFDP-YmUPsLb0hXGs8cRzjJ1OcG4BaK056j2Q_FC3u3q5MQkH0OgDW_WapqnfBGNtGMrsDVpxz4l1lqFw"/>
+<div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-teal-500 text-white text-[10px] font-bold uppercase tracking-widest">Prânz</div>
+</div>
+<h3 class="text-lg font-bold text-white mb-1">Bowl cu Somon și Quinoa</h3>
+<p class="text-sm text-gray-400 mb-4 line-clamp-1">Somon sălbatic, quinoa, edamame, dressing lime</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-emerald-400 uppercase tracking-tighter">Proteine</span>
+<span class="text-white">42g / 45g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-emerald-400" style="width: 93%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-teal-400 uppercase tracking-tighter">Carbohidrați</span>
+<span class="text-white">45g / 60g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-teal-400" style="width: 75%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-warm-accent uppercase tracking-tighter">Grăsimi</span>
+<span class="text-white">22g / 25g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-warm-accent" style="width: 88%"></div></div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+<span class="text-lg font-bold text-white">620 <span class="text-xs text-gray-500 font-normal">kcal</span></span>
+<button class="text-emerald-400 text-sm font-bold flex items-center gap-1 hover:underline">
+                                Detalii Rețetă <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="min-w-[320px] md:min-w-[380px] snap-start">
+<div class="glass-card p-5 group cursor-pointer transition-all hover:scale-[1.01]">
+<div class="relative mb-4">
+<img alt="Gustari" class="meal-thumb w-full opacity-90 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB36zfgWzUC0gzruPzmBBDyhHWeSGsijaiuvxsw3Y8ol8UWaIQWF_B76uJnOmEmyydRN4RfJY6y4TS1tyWAGwghYLFZpAgIptg5jiMY4pIjsDieL59rRK3-H_alHauKwOHlm5ui0JIW75dPiMO2ZfPPQ5ELl3zcSTM1UKZl9fD22Cqsv-rYLSfgTxhC-4kL1JHjMV9LvuWO5gLEU08S10ZhScQLQrEJ7ZXqMd1BpeGWdj1FtgcrlJIdV9Ltj7UJkZPhzrhH-kQ2Rw"/>
+<div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-amber-500 text-white text-[10px] font-bold uppercase tracking-widest">Gustări</div>
+</div>
+<h3 class="text-lg font-bold text-white mb-1">Iaurt Grecesc cu Nuci</h3>
+<p class="text-sm text-gray-400 mb-4 line-clamp-1">Iaurt 2%, migdale crude, miere bio, scorțișoară</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-emerald-400 uppercase tracking-tighter">Proteine</span>
+<span class="text-white">15g / 15g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-emerald-400" style="width: 100%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-teal-400 uppercase tracking-tighter">Carbohidrați</span>
+<span class="text-white">20g / 25g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-teal-400" style="width: 80%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-warm-accent uppercase tracking-tighter">Grăsimi</span>
+<span class="text-white">12g / 15g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-warm-accent" style="width: 80%"></div></div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+<span class="text-lg font-bold text-white">280 <span class="text-xs text-gray-500 font-normal">kcal</span></span>
+<button class="text-emerald-400 text-sm font-bold flex items-center gap-1 hover:underline">
+                                Detalii Rețetă <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="min-w-[320px] md:min-w-[380px] snap-start">
+<div class="glass-card p-5 group cursor-pointer transition-all hover:scale-[1.01]">
+<div class="relative mb-4">
+<img alt="Cina" class="meal-thumb w-full opacity-90 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiMOxF9_Y5Di9opN83js3ekJsTKz_uMahHSpHXW7RtsLgcnDTbcpNisJz-eI_2EDDoTG_NUhn2eE-evq4U6DxKS0A6XOcbXoO-8_ZpquotbyWtaNDbI3dCDeSGQBD-BsrRTzzij76a08WPw1bLNB9GPJ0FQLBJhANNUb4rMWen2LnR9Z0VJKcpzNd0jMkklRkEK2NzYRXTYxim9FIv8S6X1fCqOIYk2x9IDFXeiJuRiJw9K9s0g-7B1Qr0Arm4wiGtEMe1B7Vfuw"/>
+<div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest">Cină</div>
+</div>
+<h3 class="text-lg font-bold text-white mb-1">Curcan cu Broccoli și Orez</h3>
+<p class="text-sm text-gray-400 mb-4 line-clamp-1">Piept de curcan grill, orez negru, broccoli abur</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-emerald-400 uppercase tracking-tighter">Proteine</span>
+<span class="text-white">38g / 40g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-emerald-400" style="width: 95%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-teal-400 uppercase tracking-tighter">Carbohidrați</span>
+<span class="text-white">40g / 50g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-teal-400" style="width: 80%"></div></div>
+<div class="flex items-center justify-between text-xs font-semibold mb-1">
+<span class="text-warm-accent uppercase tracking-tighter">Grăsimi</span>
+<span class="text-white">10g / 15g</span>
+</div>
+<div class="progress-rail"><div class="h-full bg-warm-accent" style="width: 66%"></div></div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+<span class="text-lg font-bold text-white">540 <span class="text-xs text-gray-500 font-normal">kcal</span></span>
+<button class="text-emerald-400 text-sm font-bold flex items-center gap-1 hover:underline">
+                                Detalii Rețetă <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+<div class="lg:col-span-2 glass-card p-8">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-400">psychology</span>
+</div>
+<h4 class="text-xl font-bold text-white">Observații AI pentru Astăzi</h4>
+</div>
+<div class="space-y-4">
+<div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4">
+<span class="material-symbols-outlined text-emerald-400 mt-1">lightbulb</span>
+<p class="text-gray-300 text-sm leading-relaxed">
+                                Deoarece ai un nivel ușor scăzut de <strong>feritină</strong> în analizele recente, am prioritizat sursele de fier în prânzul de astăzi (somon și quinoa) și am adăugat zeamă de lămâie pentru a facilita absorbția.
+                            </p>
+</div>
+<div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4">
+<span class="material-symbols-outlined text-warm-accent mt-1">warning</span>
+<p class="text-gray-300 text-sm leading-relaxed">
+                                Evită consumul de cafea sau ceai negru cu cel puțin 60 de minute înainte și după prânz pentru a nu inhiba absorbția nutrienților critici.
+                            </p>
+</div>
+</div>
+</div>
+<div class="glass-card p-8 bg-gradient-to-br from-emerald-500/10 to-transparent border-emerald-500/20">
+<h4 class="text-lg font-bold text-white mb-6">Distribuție Macroutrienți</h4>
+<div class="relative w-48 h-48 mx-auto mb-8">
+<svg class="w-full h-full transform -rotate-90">
+<circle cx="96" cy="96" fill="none" r="80" stroke="rgba(255,255,255,0.05)" stroke-width="12"></circle>
+<circle cx="96" cy="96" fill="none" r="80" stroke="#4ade80" stroke-dasharray="502" stroke-dashoffset="300" stroke-linecap="round" stroke-width="12"></circle>
+<circle cx="96" cy="96" fill="none" r="64" stroke="#2dd4bf" stroke-dasharray="402" stroke-dashoffset="150" stroke-linecap="round" stroke-width="12"></circle>
+<circle cx="96" cy="96" fill="none" r="48" stroke="#fbbf24" stroke-dasharray="301" stroke-dashoffset="100" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-extrabold text-white">84%</span>
+<span class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Aderență</span>
+</div>
+</div>
+<div class="flex flex-wrap justify-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-emerald-400"></div> Proteine
+                        </div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-teal-400"></div> Carbo
+                        </div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-warm-accent"></div> Grăsimi
+                        </div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-8 right-8 z-[60]">
+<button class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 shadow-2xl shadow-emerald-500/40 flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95 group">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">auto_awesome</span>
+<div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 border-2 border-[#022c22] rounded-full"></div>
+</button>
+</div>
+
+</body></html>

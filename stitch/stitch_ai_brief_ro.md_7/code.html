@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ro"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NutriFit - Centru de Notificări și Setări</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-mint: #e0f2f1;
+            --accent-teal: #00897b;
+            --accent-emerald: #10b981;
+            --warm-glow: #fff9c4;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top right, var(--primary-mint), transparent),
+                        radial-gradient(circle at bottom left, var(--warm-glow), transparent),
+                        #f8fafc;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 137, 123, 0.08);
+        }
+        .toggle-switch:checked + .toggle-bg {
+            background-color: var(--accent-teal);
+        }
+        .toggle-switch:checked + .toggle-bg .toggle-dot {
+            transform: translateX(100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-slate-900">
+<nav class="sticky top-0 z-50 glass-card border-b border-white/20 mb-8">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-gradient-to-br from-[var(--accent-teal)] to-[var(--accent-emerald)] rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined font-bold">clinical_notes</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-slate-800 italic">NutriFit<span class="text-[var(--accent-teal)]">.ai</span></span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-500 hover:text-[var(--accent-teal)] transition-colors" href="#">Acasă</a>
+<a class="text-sm font-medium text-slate-500 hover:text-[var(--accent-teal)] transition-colors" href="#">Plan Personalizat</a>
+<a class="text-sm font-medium text-slate-500 hover:text-[var(--accent-teal)] transition-colors" href="#">Progres</a>
+<a class="text-sm font-medium text-slate-500 hover:text-[var(--accent-teal)] transition-colors" href="#">Discover</a>
+<a class="text-sm font-semibold text-[var(--accent-teal)] relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-[var(--accent-teal)]" href="#">Notificări</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWhUOgmMkIsEyMztpirqgAlcdT9UpBa0pKsOOUatMKbKCe196xJkcNhHU1Zy2G3BFNY6oik99qwPfHNW5-kf_2NrMhG5EYa3CK-S0f8xPc0jdcUNx06amDtHhZZHdme9uVfjy3adWOXTbve3d58ckkL4TFM7PekHvoITAXVOpfp1Hffs3KabaswGKffQnCEQKckdnQnR58R7mzYgaz4COAAsy6t2GDC3x_G4oZEpAtWZFkvdpAJrnE_Kp_aDnp6TpzQTgdcWRMRA"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 pb-12">
+<header class="mb-8">
+<h1 class="text-3xl font-bold text-slate-900 mb-2">Centru de Notificări și Setări</h1>
+<p class="text-slate-500">Rămâi la curent cu obiectivele tale de sănătate și configurează modul în care vrei să fii informat.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-7 space-y-6">
+<div class="flex items-center justify-between mb-2 px-2">
+<h2 class="text-lg font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-[var(--accent-teal)]">inbox</span>
+                        Mesaje Recepționate
+                    </h2>
+<button class="text-sm font-medium text-[var(--accent-teal)] hover:underline">Marchează tot ca citit</button>
+</div>
+<div class="space-y-4">
+<h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-2">Astăzi</h3>
+<div class="glass-card rounded-2xl p-4 flex gap-4 hover:bg-white/90 transition-all border-l-4 border-l-[var(--accent-teal)] cursor-pointer group">
+<div class="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-[var(--accent-teal)]">
+<span class="material-symbols-outlined">alarm_on</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="font-semibold text-slate-800">E timpul pentru hidratare!</h4>
+<span class="text-[10px] text-slate-400 font-medium">10:30</span>
+</div>
+<p class="text-sm text-slate-600 mt-1 leading-relaxed">Nu uita să bei un pahar cu apă. Ești la 65% din obiectivul tău zilnic de 2.5L.</p>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-slate-100 rounded-full text-slate-400">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-4 flex gap-4 hover:bg-white/90 transition-all border-l-4 border-l-amber-400 cursor-pointer group">
+<div class="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
+<span class="material-symbols-outlined">military_tech</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="font-semibold text-slate-800">Nou Record: Streak de 7 zile!</h4>
+<span class="text-[10px] text-slate-400 font-medium">08:15</span>
+</div>
+<p class="text-sm text-slate-600 mt-1 leading-relaxed">Felicitări! Ai respectat planul alimentar o săptămână întreagă. Continuă tot așa!</p>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-slate-100 rounded-full text-slate-400">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+</div>
+<div class="space-y-4 pt-4">
+<h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-2">Anterior</h3>
+<div class="glass-card rounded-2xl p-4 flex gap-4 hover:bg-white/90 transition-all border-l-4 border-l-blue-400 cursor-pointer group opacity-80 grayscale-[0.2]">
+<div class="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="font-semibold text-slate-800">Sfat Nutrițional: Magneziul</h4>
+<span class="text-[10px] text-slate-400 font-medium">Ieri</span>
+</div>
+<p class="text-sm text-slate-600 mt-1 leading-relaxed">Conform ultimelor tale analize, un aport crescut de spanac și semințe de dovleac ar putea îmbunătăți calitatea somnului.</p>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-slate-100 rounded-full text-slate-400">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-4 flex gap-4 hover:bg-white/90 transition-all border-l-4 border-l-[var(--accent-teal)] cursor-pointer group opacity-80 grayscale-[0.2]">
+<div class="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center text-[var(--accent-teal)]">
+<span class="material-symbols-outlined">fitness_center</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="font-semibold text-slate-800">Sesiune de antrenament</h4>
+<span class="text-[10px] text-slate-400 font-medium">Luni</span>
+</div>
+<p class="text-sm text-slate-600 mt-1 leading-relaxed">Ai programată sesiunea de HIIT la ora 18:00. Pregătește echipamentul!</p>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-slate-100 rounded-full text-slate-400">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+</div>
+<div class="text-center py-6">
+<button class="text-sm font-semibold text-slate-500 hover:text-[var(--accent-teal)] transition-colors flex items-center gap-2 mx-auto">
+                        Încarcă mai multe mesaje
+                        <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<div class="lg:col-span-5">
+<div class="glass-card rounded-3xl p-8 sticky top-28">
+<div class="flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-[var(--accent-teal)]">settings</span>
+<h2 class="text-lg font-bold text-slate-800">Preferințe Notificări</h2>
+</div>
+<div class="space-y-8">
+<div class="space-y-4">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Canale de Comunicare</h3>
+<div class="flex items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/60">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<div>
+<p class="font-semibold text-slate-800">Notificări Push</p>
+<p class="text-xs text-slate-500">Alerte instat pe desktop și mobil</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only toggle-switch" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 rounded-full toggle-bg transition-colors duration-200 ease-in-out">
+<div class="toggle-dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-md transition-transform duration-200 ease-in-out"></div>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-white/40 rounded-2xl border border-white/60">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<div>
+<p class="font-semibold text-slate-800">Email Digest</p>
+<p class="text-xs text-slate-500">Rezumat săptămânal al progresului</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only toggle-switch" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 rounded-full toggle-bg transition-colors duration-200 ease-in-out">
+<div class="toggle-dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-md transition-transform duration-200 ease-in-out"></div>
+</div>
+</label>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Liniște și Focus</h3>
+<div class="p-6 bg-white/40 rounded-2xl border border-white/60">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">do_not_disturb_on</span>
+<p class="font-semibold text-slate-800">Ore de Liniște (Quiet Hours)</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only toggle-switch" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 rounded-full toggle-bg transition-colors duration-200 ease-in-out">
+<div class="toggle-dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-md transition-transform duration-200 ease-in-out"></div>
+</div>
+</label>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">De la ora</label>
+<select class="w-full bg-white border-none rounded-xl text-sm focus:ring-2 focus:ring-[var(--accent-teal)]">
+<option>22:00</option>
+<option>23:00</option>
+</select>
+</div>
+<div>
+<label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Până la ora</label>
+<select class="w-full bg-white border-none rounded-xl text-sm focus:ring-2 focus:ring-[var(--accent-teal)]">
+<option>07:00</option>
+<option>08:00</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Categorii Notificări</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]" type="checkbox"/>
+<span class="text-sm text-slate-700 group-hover:text-slate-900">Remindere zilnice (apă, mese, sport)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-slate-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]" type="checkbox"/>
+<span class="text-sm text-slate-700 group-hover:text-slate-900">Achievements și Badges</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-slate-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]" type="checkbox"/>
+<span class="text-sm text-slate-700 group-hover:text-slate-900">Articole noi din Discover</span>
+</label>
+</div>
+</div>
+<button class="w-full py-4 bg-gradient-to-r from-[var(--accent-teal)] to-[var(--accent-emerald)] text-white font-bold rounded-2xl shadow-lg shadow-teal-200 hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                            Salvează Preferințele
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-100 p-4 flex justify-around">
+<span class="material-symbols-outlined text-slate-400">home</span>
+<span class="material-symbols-outlined text-slate-400">explore</span>
+<span class="material-symbols-outlined text-[var(--accent-teal)]">notifications</span>
+<span class="material-symbols-outlined text-slate-400">person</span>
+</div>
+
+</body></html>
