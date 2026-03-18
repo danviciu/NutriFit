@@ -61,7 +61,7 @@ export default function Layout() {
   return (
     <div className={`app-shell relative min-h-screen ${isFrameless ? "app-shell--frameless" : ""}`}>
       <NavigationTracker />
-      {!isFrameless ? <div className="pointer-events-none absolute inset-0 animated-grid-bg opacity-70" /> : null}
+      {!isFrameless ? <div className="pointer-events-none absolute inset-0 -z-10 animated-grid-bg opacity-10" /> : null}
 
       {!isFrameless ? (
         <header className="sticky top-0 z-30 px-3 py-3 md:px-6">
@@ -85,7 +85,6 @@ export default function Layout() {
                 <>
                   <Link to="/wizard" className={navClass("/wizard")}>Profil</Link>
                   <Link to="/plan" className={navClass("/plan")}>Plan personalizat</Link>
-                  <Link to="/progress" className={navClass("/progress")}>Progres</Link>
                   <Link to="/notifications" className={navClass("/notifications")}>
                     <span className="inline-flex items-center gap-2">
                       <span>Notificari</span>

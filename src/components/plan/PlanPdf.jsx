@@ -1,4 +1,14 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { Document, Font, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import liberationSansRegular from "pdfjs-dist/standard_fonts/LiberationSans-Regular.ttf?url";
+import liberationSansBold from "pdfjs-dist/standard_fonts/LiberationSans-Bold.ttf?url";
+
+Font.register({
+  family: "LiberationSans",
+  fonts: [
+    { src: liberationSansRegular, fontWeight: 400 },
+    { src: liberationSansBold, fontWeight: 700 },
+  ],
+});
 
 const styles = StyleSheet.create({
   page: {
@@ -6,7 +16,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     paddingHorizontal: 26,
     fontSize: 10,
-    fontFamily: "Helvetica",
+    fontFamily: "LiberationSans",
     color: "#10231c",
     backgroundColor: "#f8fffb",
   },
@@ -168,11 +178,31 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 7,
   },
+  listRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  listLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    maxWidth: "75%",
+  },
+  listCheckbox: {
+    fontSize: 8.5,
+    color: "#5d7d71",
+    marginRight: 5,
+  },
   listItem: {
     fontSize: 8.5,
     color: "#2b4a40",
-    marginBottom: 2,
     lineHeight: 1.3,
+  },
+  listQty: {
+    fontSize: 8.5,
+    color: "#173e31",
+    fontWeight: "bold",
   },
   disclaimer: {
     marginTop: 10,
@@ -183,17 +213,20 @@ const styles = StyleSheet.create({
     color: "#4a6b5f",
     lineHeight: 1.35,
   },
-  footer: {
+  footerBrand: {
     position: "absolute",
     bottom: 12,
     left: 26,
-    right: 26,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  footerText: {
     fontSize: 8,
     color: "#5d7d71",
+  },
+  footerPage: {
+    position: "absolute",
+    bottom: 12,
+    right: 26,
+    fontSize: 8,
+    color: "#5d7d71",
+    textAlign: "right",
   },
 });
 
@@ -227,6 +260,16 @@ function mealLine(meal) {
   return `${meal?.slot || "Masa"}: ${foods}`;
 }
 
+function normalizeShoppingEntry(item, index) {
+  const label = String(item?.item || item?.name || `Item ${index + 1}`)
+    .replace(/\[\s*\]/g, "")
+    .replace(/^[\-\*\s]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const quantity = String(item?.quantity || item?.amount || "").trim() || "1 buc";
+  return { label, quantity };
+}
+
 export default function PlanPdf({ profile, plan }) {
   const macros = macroItems(plan || {});
   const weekly = Array.isArray(plan?.weeklyPlan) ? plan.weeklyPlan : [];
@@ -237,6 +280,9 @@ export default function PlanPdf({ profile, plan }) {
 
   const profileWeight = profile?.weight_kg || profile?.weightKg || "-";
   const profileHeight = profile?.height_cm || profile?.heightCm || "-";
+  const shoppingRows = (shopping.length ? shopping : [{ item: "Lista goala", quantity: "-" }])
+    .slice(0, 16)
+    .map((item, index) => normalizeShoppingEntry(item, index));
 
   return (
     <Document>
@@ -312,10 +358,12 @@ export default function PlanPdf({ profile, plan }) {
           afectiuni diagnosticate, consulta medicul specialist.
         </Text>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>NutriFit Visual Engine</Text>
-          <Text style={styles.footerText}>Pagina 1/2</Text>
-        </View>
+        <Text style={styles.footerBrand} fixed>NutriFit Visual Engine</Text>
+        <Text
+          style={styles.footerPage}
+          fixed
+          render={({ pageNumber, totalPages }) => `Pagina ${pageNumber}/${totalPages}`}
+        />
       </Page>
 
       <Page size="A4" style={styles.page}>
@@ -344,10 +392,15 @@ export default function PlanPdf({ profile, plan }) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Lista cumparaturi</Text>
           <View style={styles.kpiGrid}>
-            {(shopping.length ? shopping : [{ item: "Lista goala", quantity: "-" }]).slice(0, 16).map((item, idx) => (
+            {shoppingRows.map((item, idx) => (
               <View key={`shop-${idx}`} style={styles.listCard}>
-                <Text style={styles.listItem}>- {item.item || item.name || "Item"}</Text>
-                <Text style={styles.listItem}>Cantitate: {item.quantity || item.amount || "-"}</Text>
+                <View style={styles.listRow}>
+                  <View style={styles.listLeft}>
+                    <Text style={styles.listCheckbox}>[ ]</Text>
+                    <Text style={styles.listItem}>{item.label}</Text>
+                  </View>
+                  <Text style={styles.listQty}>{item.quantity}</Text>
+                </View>
               </View>
             ))}
           </View>
@@ -365,10 +418,12 @@ export default function PlanPdf({ profile, plan }) {
           modificare majora a stilului de viata.
         </Text>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>NutriFit Visual Engine</Text>
-          <Text style={styles.footerText}>Pagina 2/2</Text>
-        </View>
+        <Text style={styles.footerBrand} fixed>NutriFit Visual Engine</Text>
+        <Text
+          style={styles.footerPage}
+          fixed
+          render={({ pageNumber, totalPages }) => `Pagina ${pageNumber}/${totalPages}`}
+        />
       </Page>
     </Document>
   );

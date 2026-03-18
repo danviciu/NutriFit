@@ -29,7 +29,6 @@ Pentru local, pastrezi cheile Supabase in `.env.local` (fisier local, neversiona
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-VITE_BASE44_API_KEY=efc3355417904d65821f0461db7e7198
 ```
 
 ### Backend `server/.env`
@@ -37,10 +36,20 @@ VITE_BASE44_API_KEY=efc3355417904d65821f0461db7e7198
 ```env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
-BASE44_API_KEY=efc3355417904d65821f0461db7e7198
+BASE44_API_KEY=your-base44-api-key
 BASE44_API_URL=http://localhost:8787
+GOOGLE_API_KEY=your-google-ai-api-key
+GOOGLE_PLAN_MODEL=gemini-2.5-flash
+OPENAI_API_KEY=your-openai-api-key
+OPENAI_PLAN_MODEL=gpt-4o-mini
+AI_PLAN_TEMPERATURE=0.2
+AI_PLAN_REPAIR_ATTEMPTS=2
+AI_PLAN_REQUIRED=true
 PORT=8787
 ```
+
+`AI_PLAN_REQUIRED=true` forteaza generarea planului exclusiv prin AI (fara fallback local ascuns).
+Daca nu ai provider AI configurat (BASE44 extern, `GOOGLE_API_KEY` sau `OPENAI_API_KEY`), endpoint-ul `/generate-plan` va returna eroare explicita.
 
 ## 2) Setup Supabase
 

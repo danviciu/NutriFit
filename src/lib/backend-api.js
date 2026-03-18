@@ -85,7 +85,11 @@ async function request(path, token, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(payload?.error || `Request failed: ${response.status}`);
+    const error = new Error(payload?.error || `Request failed: ${response.status}`);
+    error.status = response.status;
+    error.code = payload?.code || "";
+    error.payload = payload;
+    throw error;
   }
 
   return payload;
@@ -317,6 +321,38 @@ export function uploadLabs(token, file) {
 
 export function generatePlan(token) {
   return request("/generate-plan", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+}
+
+export function getBillingPlans() {
+  return request("/billing/plans", null);
+}
+
+export function getMySubscription(token) {
+  return request("/me/subscription", token);
+}
+
+export function activateSubscription(token, planCode = "pro_monthly") {
+  return request("/me/subscription/activate", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ planCode }),
+  });
+}
+
+export function cancelSubscription(token) {
+  return request("/me/subscription/cancel", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+}
+
+export function reactivateSubscription(token) {
+  return request("/me/subscription/reactivate", token, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),

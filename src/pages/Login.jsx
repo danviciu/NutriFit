@@ -1,12 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
@@ -21,7 +23,13 @@ export default function Login() {
       await signIn({ email, password });
       navigate("/wizard", { replace: true });
     } catch (err) {
-      setError(err.message || "Autentificare esuata");
+      const raw = String(err?.message || "");
+      const normalized = raw.toLowerCase();
+      if (normalized.includes("email not confirmed")) {
+        setError("Emailul nu este confirmat. Verifica inbox/spam si confirma contul inainte de login.");
+      } else {
+        setError(raw || "Autentificare esuata");
+      }
     } finally {
       setLoading(false);
     }
@@ -38,7 +46,7 @@ export default function Login() {
           <div className="relative z-10">
             <div className="mb-12 flex items-center gap-2">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-400 shadow-lg shadow-emerald-500/20">
-                <span className="text-white">✚</span>
+                <span className="text-white">NF</span>
               </div>
               <span className="text-2xl font-bold tracking-tight text-white">NutriFit</span>
             </div>
@@ -77,12 +85,16 @@ export default function Login() {
                     <label className="text-sm font-semibold text-slate-700">Parola</label>
                   </div>
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    placeholder="••••••••"
+                    placeholder="********"
                     required
                   />
+                  <label className="ml-1 mt-2 flex items-center gap-2 text-xs text-slate-600">
+                    <Checkbox checked={showPassword} onChange={(event) => setShowPassword(event.target.checked)} />
+                    Arata parola
+                  </label>
                 </div>
 
                 <button

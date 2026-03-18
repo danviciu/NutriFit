@@ -6,7 +6,6 @@ import { suggestLocal, suggestWithApi } from "@/api/ai";
 import { getProfile, logUserEvent, upsertProfile, uploadLabs } from "@/lib/backend-api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { WIZARD_STEPS } from "@/lib/app-params";
 import { useAuth } from "@/lib/AuthContext";
 import WizardStep1 from "@/wizard/WizardStep1";
 import WizardStep2 from "@/wizard/WizardStep2";
@@ -30,8 +29,6 @@ const defaultState = {
 };
 
 export default function Wizard() {
-  const [step, setStep] = useState(0);
-  const [hasVisitedLabsStep, setHasVisitedLabsStep] = useState(false);
   const [error, setError] = useState("");
   const [suggestion, setSuggestion] = useState("");
   const [suggestLoading, setSuggestLoading] = useState(false);
@@ -48,7 +45,6 @@ export default function Wizard() {
   });
 
   const {
-    trigger,
     handleSubmit,
     reset,
     watch,
@@ -89,27 +85,28 @@ export default function Wizard() {
   }, [accessToken, reset]);
 
   useEffect(() => {
-    if (step === WIZARD_STEPS.length - 1) setHasVisitedLabsStep(true);
-  }, [step]);
-
-  useEffect(() => {
     if (!accessToken) return;
     logUserEvent(accessToken, {
-      eventName: "wizard_step_view",
+      eventName: "profile_editor_open",
       page: "/wizard",
-      metadata: { step, stepLabel: WIZARD_STEPS[step] },
+      metadata: { layout: "single_page" },
     }).catch(() => {});
-  }, [accessToken, step]);
-
-  const progress = Math.round(((step + 1) / WIZARD_STEPS.length) * 100);
+  }, [accessToken]);
 
   const handleSuggest = async () => {
     setSuggestLoading(true);
     try {
       const formData = watch();
-      const apiSuggestion = await suggestWithApi({ profileDraft: formData, locale: "ro" });
-      if (apiSuggestion?.suggestion) setSuggestion(apiSuggestion.suggestion);
-      else {
+      if (!accessToken) {
+        const local = await suggestLocal(formData);
+        setSuggestion(local.suggestion);
+        return;
+      }
+
+      const apiSuggestion = await suggestWithApi({ profileDraft: formData, locale: "ro" }, accessToken);
+      if (apiSuggestion?.suggestion) {
+        setSuggestion(apiSuggestion.suggestion);
+      } else {
         const local = await suggestLocal(formData);
         setSuggestion(local.suggestion);
       }
@@ -137,35 +134,7 @@ export default function Wizard() {
     }
   };
 
-  const goNext = async () => {
-    let fieldsToValidate = [];
-    if (step === 0) fieldsToValidate = ["age", "heightCm", "weightKg"];
-    if (step === 1) fieldsToValidate = ["goal", "activityLevel"];
-    if (fieldsToValidate.length > 0) {
-      const isValid = await trigger(fieldsToValidate);
-      if (!isValid) return;
-    }
-
-    setError("");
-    setStep((prev) => Math.min(WIZARD_STEPS.length - 1, prev + 1));
-  };
-
-  const goBack = () => {
-    setError("");
-    setStep((prev) => Math.max(0, prev - 1));
-  };
-
   const onSubmit = async (data) => {
-    if (step < WIZARD_STEPS.length - 1) {
-      goNext();
-      return;
-    }
-
-    if (!hasVisitedLabsStep) {
-      setStep(WIZARD_STEPS.length - 1);
-      return;
-    }
-
     if (!accessToken) return;
     setError("");
 
@@ -183,6 +152,11 @@ export default function Wizard() {
         labsText: data.labsText,
         labsFileName: data.labsFileName,
       });
+      logUserEvent(accessToken, {
+        eventName: "profile_saved",
+        page: "/wizard",
+        metadata: { hasLabsFile: Boolean(data.labsFileName), hasLabsText: Boolean(data.labsText) },
+      }).catch(() => {});
       navigate("/plan", { replace: true });
     } catch (err) {
       setError(err.message || "Nu am putut salva profilul.");
@@ -191,55 +165,41 @@ export default function Wizard() {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pb-8">
-        <div className="relative overflow-hidden rounded-[32px] border border-white/80 bg-white/70 p-8 backdrop-blur md:p-12">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-8">
+        <section className="relative overflow-hidden rounded-[32px] border border-white/80 bg-white/70 p-8 backdrop-blur md:p-10">
           <div className="pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full bg-emerald-100/70 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 -right-10 h-52 w-52 rounded-full bg-teal-100/70 blur-3xl" />
-
-          <div className="relative z-10">
-            <div className="mb-8 text-center">
-              <div className="mb-3 flex items-end justify-between">
-                <span className="text-sm font-semibold uppercase tracking-wider text-teal-800">
-                  Pasul {step + 1} din {WIZARD_STEPS.length}
-                </span>
-                <span className="text-sm font-medium italic text-teal-600">Aproape gata!</span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-teal-100">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-600 transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-
-            {step === 0 ? <WizardStep1 /> : null}
-            {step === 1 ? <WizardStep2 /> : null}
-            {step === 2 ? <WizardStep3 onSuggest={handleSuggest} suggestion={suggestion} suggestLoading={suggestLoading} /> : null}
-            {step === 3 ? <WizardStep4 onUploadFile={handleLabsUpload} uploading={uploadingLabs} extractedLabs={extractedLabs} /> : null}
-
-            {error ? (
-              <Alert variant="destructive" className="mt-6">
-                <AlertTitle>Eroare</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            ) : null}
-
-            <div className="mt-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
-              <Button type="button" variant="outline" onClick={goBack} disabled={step === 0 || isSubmitting}>
-                Pasul anterior
-              </Button>
-              {step < WIZARD_STEPS.length - 1 ? (
-                <Button type="button" onClick={goNext}>
-                  Continua
-                </Button>
-              ) : (
-                <Button type="submit" disabled={isSubmitting || uploadingLabs}>
-                  {isSubmitting ? "Se salveaza..." : "Finalizeaza profilul"}
-                </Button>
-              )}
-            </div>
+          <div className="relative z-10 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-700">Tab unic utilizator</p>
+            <h1 className="mt-2 text-3xl font-bold text-slate-900 md:text-4xl">Toate informatiile profilului intr-o singura pagina</h1>
+            <p className="mx-auto mt-3 max-w-2xl text-sm text-slate-600">
+              Completeaza datele fizice, obiectivele, preferintele si analizele in acelasi ecran, apoi salveaza o singura data.
+            </p>
           </div>
-        </div>
+        </section>
+
+        <section className="space-y-8 rounded-[32px] border border-white/80 bg-white/75 p-8 backdrop-blur md:p-10">
+          <WizardStep1 />
+          <div className="h-px bg-slate-200/80" />
+          <WizardStep2 />
+          <div className="h-px bg-slate-200/80" />
+          <WizardStep3 onSuggest={handleSuggest} suggestion={suggestion} suggestLoading={suggestLoading} />
+          <div className="h-px bg-slate-200/80" />
+          <WizardStep4 onUploadFile={handleLabsUpload} uploading={uploadingLabs} extractedLabs={extractedLabs} />
+
+          {error ? (
+            <Alert variant="destructive">
+              <AlertTitle>Eroare</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
+
+          <div className="flex justify-end">
+            <Button type="submit" disabled={isSubmitting || uploadingLabs}>
+              {isSubmitting ? "Se salveaza..." : "Salveaza profilul"}
+            </Button>
+          </div>
+        </section>
       </form>
     </FormProvider>
   );

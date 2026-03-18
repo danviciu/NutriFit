@@ -1,7 +1,8 @@
-const API_KEY = import.meta.env.VITE_BASE44_API_KEY;
-const API_URL = import.meta.env.VITE_BASE44_API_URL;
+import { API_BASE_URL } from "@/lib/app-params";
 
-async function postJson(path, payload) {
+const API_URL = API_BASE_URL;
+
+async function postJson(path, payload, token = "") {
   if (!API_URL) return null;
 
   try {
@@ -9,7 +10,7 @@ async function postJson(path, payload) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        api_key: API_KEY || "",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(payload),
     });
@@ -23,12 +24,12 @@ async function postJson(path, payload) {
   }
 }
 
-export async function generatePlanWithApi(profile) {
-  return postJson("/generate-plan", { profile });
+export async function generatePlanWithApi(profile, token = "") {
+  return postJson("/generate-plan", { profile }, token);
 }
 
-export async function suggestWithApi(payload) {
-  return postJson("/suggest", payload);
+export async function suggestWithApi(payload, token = "") {
+  return postJson("/suggest", payload, token);
 }
 
 export async function suggestLocal(profile) {
@@ -40,6 +41,6 @@ export async function suggestLocal(profile) {
 
 export const apiConfig = {
   API_URL,
-  hasApiKey: Boolean(API_KEY),
+  authFromBackend: true,
 };
 

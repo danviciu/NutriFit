@@ -143,6 +143,22 @@ create table if not exists public.user_notifications (
   dismissed_at timestamptz
 );
 
+create table if not exists public.user_subscriptions (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  plan_code text not null default 'pro_monthly',
+  status text not null default 'active',
+  provider text not null default 'manual',
+  provider_customer_id text,
+  provider_subscription_id text,
+  started_at timestamptz not null default timezone('utc', now()),
+  current_period_start timestamptz not null default timezone('utc', now()),
+  current_period_end timestamptz not null default (timezone('utc', now()) + interval '30 day'),
+  cancel_at_period_end boolean not null default false,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
 create index if not exists idx_labs_documents_user on public.labs_documents(user_id, uploaded_at desc);
 create index if not exists idx_labs_extracted_user on public.labs_extracted(user_id, extracted_at desc);
 create index if not exists idx_plans_user on public.plans(user_id, created_at desc);
@@ -157,6 +173,7 @@ create index if not exists idx_content_bookmarks_content on public.content_bookm
 create unique index if not exists idx_user_notifications_user_dedupe on public.user_notifications(user_id, dedupe_key) where dedupe_key is not null;
 create index if not exists idx_user_notifications_user_status_created on public.user_notifications(user_id, status, created_at desc);
 create index if not exists idx_user_notifications_user_created on public.user_notifications(user_id, created_at desc);
+create index if not exists idx_user_subscriptions_status_period on public.user_subscriptions(status, current_period_end desc);
 
 alter table public.profiles enable row level security;
 alter table public.labs_documents enable row level security;
@@ -169,6 +186,7 @@ alter table public.content_refresh_runs enable row level security;
 alter table public.content_bookmarks enable row level security;
 alter table public.notification_preferences enable row level security;
 alter table public.user_notifications enable row level security;
+alter table public.user_subscriptions enable row level security;
 
 -- profiles policies
 drop policy if exists profiles_select_own on public.profiles;
@@ -367,6 +385,33 @@ create policy user_notifications_update_own
 
 create policy user_notifications_delete_own
   on public.user_notifications for delete
+  to authenticated
+  using (auth.uid() = user_id);
+
+-- user_subscriptions policies
+drop policy if exists user_subscriptions_select_own on public.user_subscriptions;
+drop policy if exists user_subscriptions_insert_own on public.user_subscriptions;
+drop policy if exists user_subscriptions_update_own on public.user_subscriptions;
+drop policy if exists user_subscriptions_delete_own on public.user_subscriptions;
+
+create policy user_subscriptions_select_own
+  on public.user_subscriptions for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create policy user_subscriptions_insert_own
+  on public.user_subscriptions for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+create policy user_subscriptions_update_own
+  on public.user_subscriptions for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy user_subscriptions_delete_own
+  on public.user_subscriptions for delete
   to authenticated
   using (auth.uid() = user_id);
 

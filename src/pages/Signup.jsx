@@ -1,29 +1,61 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/AuthContext";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const [resending, setResending] = useState(false);
+  const { signUp, resendSignupConfirmation } = useAuth();
   const navigate = useNavigate();
 
   const onSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setInfo("");
 
     try {
-      await signUp({ email, password });
-      navigate("/wizard", { replace: true });
+      const result = await signUp({ email, password });
+      if (result?.session) {
+        navigate("/wizard", { replace: true });
+        return;
+      }
+      setInfo(
+        "Cont creat. Verifica emailul (si folderul Spam) pentru confirmare. Dupa confirmare, autentifica-te.",
+      );
     } catch (err) {
-      setError(err.message || "Creare cont esuata");
+      const raw = String(err?.message || "");
+      const normalized = raw.toLowerCase();
+      if (normalized.includes("email rate limit exceeded")) {
+        setError(
+          "S-a atins limita de emailuri de confirmare pe proiectul Supabase. Incearca din nou mai tarziu sau mareste limita in Supabase Auth > Rate Limits.",
+        );
+      } else {
+        setError(raw || "Creare cont esuata");
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onResendConfirmation = async () => {
+    setResending(true);
+    setError("");
+    try {
+      await resendSignupConfirmation(email);
+      setInfo("Emailul de confirmare a fost retrimis. Verifica inbox/spam.");
+    } catch (err) {
+      setError(String(err?.message || "Nu am putut retrimite emailul de confirmare."));
+    } finally {
+      setResending(false);
     }
   };
 
@@ -38,7 +70,7 @@ export default function Signup() {
           <div className="relative z-10">
             <div className="mb-12 flex items-center gap-2">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-400 shadow-lg shadow-emerald-500/20">
-                <span className="text-white">✚</span>
+                <span className="text-white">NF</span>
               </div>
               <span className="text-2xl font-bold tracking-tight text-white">NutriFit</span>
             </div>
@@ -74,13 +106,17 @@ export default function Signup() {
                 <div className="space-y-2">
                   <label className="ml-1 text-sm font-semibold text-slate-700">Parola</label>
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     minLength={6}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="minimum 6 caractere"
                     required
                   />
+                  <label className="ml-1 mt-2 flex items-center gap-2 text-xs text-slate-600">
+                    <Checkbox checked={showPassword} onChange={(event) => setShowPassword(event.target.checked)} />
+                    Arata parola
+                  </label>
                 </div>
 
                 <button
@@ -91,6 +127,21 @@ export default function Signup() {
                   {loading ? "Se creeaza..." : "Creeaza cont"}
                 </button>
               </form>
+
+              {info ? (
+                <Alert className="mt-6">
+                  <AlertTitle>Verificare email</AlertTitle>
+                  <AlertDescription>{info}</AlertDescription>
+                  <button
+                    type="button"
+                    className="mt-3 rounded-xl border border-teal-200 bg-white px-3 py-2 text-xs font-semibold text-teal-700 hover:bg-teal-50 disabled:opacity-60"
+                    onClick={onResendConfirmation}
+                    disabled={resending || !email}
+                  >
+                    {resending ? "Se retrimite..." : "Retrimite emailul de confirmare"}
+                  </button>
+                </Alert>
+              ) : null}
 
               {error ? (
                 <Alert variant="destructive" className="mt-6">

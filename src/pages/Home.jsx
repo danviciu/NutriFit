@@ -587,12 +587,12 @@ export default function Home() {
                     : "Activeaza contul ca sa vezi scorul de monitorizare in timp real."}
                 </p>
               </div>
-              <Link to="/progress">
+              <Link to="/plan">
                 <Button
                   variant="outline"
                   className="h-auto rounded-xl border-teal-400 bg-white/95 px-6 py-3 text-base font-extrabold text-teal-900 hover:bg-white"
                 >
-                  Vezi statistici complete
+                  Vezi planul personalizat
                 </Button>
               </Link>
             </div>

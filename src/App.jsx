@@ -11,7 +11,6 @@ const ViewPlan = lazy(() => import("@/pages/ViewPlan"));
 const GeneratePlan = lazy(() => import("@/pages/GeneratePlan"));
 const Discover = lazy(() => import("@/pages/Discover"));
 const DiscoverArticle = lazy(() => import("@/pages/DiscoverArticle"));
-const ProgressCenter = lazy(() => import("@/pages/ProgressCenter"));
 const NotificationsCenter = lazy(() => import("@/pages/NotificationsCenter"));
 const PageNotFound = lazy(() => import("@/lib/PageNotFound"));
 
@@ -88,14 +87,7 @@ export default function App() {
           />
           <Route path="/discover" element={<Discover />} />
           <Route path="/discover/:slug" element={<DiscoverArticle />} />
-          <Route
-            path="/progress"
-            element={
-              <ProtectedRoute>
-                <ProgressCenter />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/progress" element={<Navigate to="/plan" replace />} />
           <Route
             path="/notifications"
             element={

@@ -6,7 +6,82 @@ dotenv.config({ path: "./server/.env" });
 const API_KEY = process.env.BASE44_API_KEY;
 const API_URL = process.env.BASE44_API_URL || "http://localhost:8787";
 const SELF_PORT = process.env.PORT || "8787";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
+const OPENAI_PLAN_MODEL = process.env.OPENAI_PLAN_MODEL || process.env.OPENAI_MODEL || "gpt-4o-mini";
+const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_TIMEOUT_MS || 45000);
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || "";
+const GOOGLE_PLAN_MODEL = process.env.GOOGLE_PLAN_MODEL || process.env.GEMINI_PLAN_MODEL || "gemini-2.5-flash";
+const GOOGLE_TIMEOUT_MS = Number(process.env.GOOGLE_TIMEOUT_MS || OPENAI_TIMEOUT_MS || 45000);
 const PANEL_KEYS = ["cbc", "metabolic", "lipids", "thyroid", "inflammation", "other"];
+const OPENAI_PLAN_TEXT_FORMAT = {
+  type: "json_schema",
+  name: "nutrition_plan_v1",
+  strict: true,
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    required: ["weeklyPlan", "targets", "summary", "notes", "fitness", "shoppingList", "disclaimer"],
+    properties: {
+      weeklyPlan: {
+        type: "array",
+        minItems: 7,
+        maxItems: 7,
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["day", "meals"],
+          properties: {
+            day: { type: "string" },
+            meals: {
+              type: "array",
+              minItems: 1,
+              items: {
+                type: "object",
+                additionalProperties: false,
+                required: ["slot", "foods"],
+                properties: {
+                  slot: { type: "string" },
+                  foods: {
+                    type: "array",
+                    minItems: 1,
+                    items: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      targets: {
+        type: "object",
+        additionalProperties: false,
+        required: ["kcal", "protein", "carbs", "fat", "fibre"],
+        properties: {
+          kcal: { type: "number" },
+          protein: { type: "number" },
+          carbs: { type: "number" },
+          fat: { type: "number" },
+          fibre: { type: "number" },
+        },
+      },
+      summary: { type: "string" },
+      notes: {
+        type: "array",
+        items: { type: "string" },
+      },
+      fitness: {
+        type: "array",
+        items: { type: "string" },
+      },
+      shoppingList: {
+        type: "array",
+        items: { type: "string" },
+      },
+      disclaimer: { type: "string" },
+    },
+  },
+};
+const GOOGLE_PLAN_RESPONSE_JSON_SCHEMA = OPENAI_PLAN_TEXT_FORMAT.schema;
 
 function pointsToSelf() {
   return API_URL === `http://localhost:${SELF_PORT}` || API_URL === `http://127.0.0.1:${SELF_PORT}`;
@@ -786,16 +861,808 @@ export async function extractLabsWithAI(text, sourceType = "unknown") {
   return chooseBestExtraction(candidates);
 }
 
+function hasValidWeeklyPlan(plan) {
+  return Boolean(plan && typeof plan === "object" && Array.isArray(plan.weeklyPlan) && plan.weeklyPlan.length >= 7);
+}
+
+const DEFAULT_RO_DAY_NAMES = ["Luni", "Marti", "Miercuri", "Joi", "Vineri", "Sambata", "Duminica"];
+const PLAN_TEMPERATURE = Number(process.env.AI_PLAN_TEMPERATURE || 0.2);
+const PLAN_MAX_OUTPUT_TOKENS = Number(process.env.AI_PLAN_MAX_OUTPUT_TOKENS || 2600);
+const MAX_PLAN_REPAIR_ATTEMPTS = Math.max(0, Number(process.env.AI_PLAN_REPAIR_ATTEMPTS || 2));
+const FOOD_QUANTITY_REGEX = /\b\d+(?:[.,]\d+)?\s*(g|gr|gram|grame|ml|buc|bucata|bucati|felie|felii|lingura|linguri|lingurita|lingurite)\b/i;
+const FOOD_GRAMS_REGEX = /\b(\d+(?:[.,]\d+)?)\s*(g|gr|gram|grame)\b/i;
+const MAX_DAY_MENU_REPEATS = 2;
+const GENERIC_RESTRICTION_TERMS = new Set([
+  "none",
+  "nimic",
+  "fara",
+  "fara restrictii",
+  "nu",
+  "n/a",
+  "na",
+  "-",
+  "niciuna",
+  "niciuna cunoscuta",
+  "none known",
+]);
+
+function normalizeMealList(rawMeals) {
+  if (Array.isArray(rawMeals)) {
+    return rawMeals
+      .map((meal, index) => {
+        const fallbackSlot = `Masa ${index + 1}`;
+        const foods = Array.isArray(meal?.foods)
+          ? meal.foods
+          : Array.isArray(meal?.items)
+            ? meal.items
+            : [];
+        return {
+          slot: String(meal?.slot || meal?.name || fallbackSlot),
+          foods: foods.map((item) => String(item || "").trim()).filter(Boolean),
+        };
+      })
+      .filter((meal) => meal.foods.length);
+  }
+
+  if (rawMeals && typeof rawMeals === "object") {
+    return Object.entries(rawMeals)
+      .map(([key, meal]) => {
+        const foods = Array.isArray(meal?.foods)
+          ? meal.foods
+          : Array.isArray(meal?.items)
+            ? meal.items
+            : [];
+        return {
+          slot: String(meal?.slot || key),
+          foods: foods.map((item) => String(item || "").trim()).filter(Boolean),
+        };
+      })
+      .filter((meal) => meal.foods.length);
+  }
+
+  return [];
+}
+
+function normalizeWeeklyPlan(rawWeeklyPlan) {
+  if (Array.isArray(rawWeeklyPlan)) {
+    return rawWeeklyPlan
+      .map((dayEntry, index) => ({
+        day: String(dayEntry?.day || dayEntry?.name || DEFAULT_RO_DAY_NAMES[index] || `Ziua ${index + 1}`),
+        meals: normalizeMealList(dayEntry?.meals),
+      }))
+      .filter((entry) => entry.meals.length);
+  }
+
+  if (rawWeeklyPlan && typeof rawWeeklyPlan === "object") {
+    const entries = Object.entries(rawWeeklyPlan);
+    return entries
+      .map(([key, dayEntry], index) => ({
+        day: String(dayEntry?.day || dayEntry?.name || key || DEFAULT_RO_DAY_NAMES[index] || `Ziua ${index + 1}`),
+        meals: normalizeMealList(dayEntry?.meals || dayEntry),
+      }))
+      .filter((entry) => entry.meals.length);
+  }
+
+  return [];
+}
+
+function normalizeAiPlanShape(plan) {
+  if (!plan || typeof plan !== "object") return null;
+
+  const normalizedWeeklyPlan = normalizeWeeklyPlan(plan.weeklyPlan);
+  if (normalizedWeeklyPlan.length < 7) return null;
+
+  const targetsInput = plan.targets && typeof plan.targets === "object" ? plan.targets : {};
+  const targets = {
+    kcal: toNumber(targetsInput.kcal),
+    protein: toNumber(targetsInput.protein),
+    carbs: toNumber(targetsInput.carbs),
+    fat: toNumber(targetsInput.fat),
+    fibre: toNumber(targetsInput.fibre),
+  };
+  const notes = Array.isArray(plan.notes)
+    ? plan.notes.map((note) => String(note || "").trim()).filter(Boolean)
+    : [];
+  const fitness = Array.isArray(plan.fitness)
+    ? plan.fitness.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  const shoppingList = Array.isArray(plan.shoppingList)
+    ? plan.shoppingList
+        .map((item) => {
+          if (item && typeof item === "object") {
+            const name = String(item.item || item.name || "").trim();
+            const quantity = String(item.quantity || item.amount || "").trim();
+            if (name && quantity) return `${name} - ${quantity}`;
+            if (name) return name;
+            if (quantity) return quantity;
+            return null;
+          }
+          const text = String(item || "").trim();
+          return text || null;
+        })
+        .filter(Boolean)
+    : [];
+  const summary = String(plan.summary || "").trim();
+  const disclaimer = String(plan.disclaimer || "").trim();
+
+  return {
+    ...plan,
+    weeklyPlan: normalizedWeeklyPlan,
+    targets,
+    notes,
+    fitness,
+    shoppingList,
+    summary,
+    disclaimer,
+  };
+}
+
+function safeJsonParse(rawText) {
+  try {
+    return JSON.parse(rawText);
+  } catch {
+    return null;
+  }
+}
+
+function extractJsonCandidate(rawText) {
+  const text = String(rawText || "").trim();
+  if (!text) return null;
+
+  const direct = safeJsonParse(text);
+  if (direct) return direct;
+
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
+
+  return safeJsonParse(text.slice(start, end + 1));
+}
+
+function extractResponsesParsedObject(payload) {
+  const outputItems = Array.isArray(payload?.output) ? payload.output : [];
+
+  for (const outputItem of outputItems) {
+    const contentItems = Array.isArray(outputItem?.content) ? outputItem.content : [];
+    for (const contentItem of contentItems) {
+      if (contentItem?.parsed && typeof contentItem.parsed === "object") {
+        return contentItem.parsed;
+      }
+      if (contentItem?.json && typeof contentItem.json === "object") {
+        return contentItem.json;
+      }
+    }
+  }
+
+  return null;
+}
+
+function extractResponsesOutputText(payload) {
+  if (typeof payload?.output_text === "string" && payload.output_text.trim()) {
+    return payload.output_text.trim();
+  }
+
+  const outputItems = Array.isArray(payload?.output) ? payload.output : [];
+  const chunks = [];
+
+  outputItems.forEach((outputItem) => {
+    const contentItems = Array.isArray(outputItem?.content) ? outputItem.content : [];
+    contentItems.forEach((contentItem) => {
+      if (contentItem?.type === "output_text" && typeof contentItem?.text === "string" && contentItem.text.trim()) {
+        chunks.push(contentItem.text.trim());
+      }
+    });
+  });
+
+  return chunks.join("\n").trim();
+}
+
+function hasLabsSnapshot(labs) {
+  if (!labs) return false;
+  if (typeof labs === "string") return Boolean(labs.trim());
+  if (Array.isArray(labs)) return labs.length > 0;
+  if (typeof labs !== "object") return false;
+
+  const panels = labs?.panels;
+  if (panels && typeof panels === "object") {
+    return Object.values(panels).some((value) => Array.isArray(value) && value.length > 0);
+  }
+
+  return Object.keys(labs).length > 0;
+}
+
+function inferMissingPlanInputs(profile, labs) {
+  const missing = [];
+  const profileObj = profile && typeof profile === "object" ? profile : {};
+
+  const fields = [
+    { keys: ["sex"], label: "sex" },
+    { keys: ["age"], label: "age" },
+    { keys: ["height_cm", "heightCm"], label: "inaltime" },
+    { keys: ["weight_kg", "weightKg"], label: "greutate" },
+    { keys: ["goal"], label: "obiectiv" },
+    { keys: ["activity_level", "activityLevel"], label: "nivel activitate" },
+  ];
+
+  fields.forEach(({ keys, label }) => {
+    const value = keys.map((key) => profileObj?.[key]).find((item) => item !== undefined && item !== null && item !== "");
+    if (value === undefined || value === null || value === "") missing.push(label);
+  });
+
+  const hasPrefs = Boolean(String(profileObj?.dietary_prefs || profileObj?.dietaryPrefs || "").trim());
+  if (!hasPrefs) missing.push("preferinte alimentare");
+
+  const hasAllergies = Boolean(String(profileObj?.allergies || "").trim());
+  if (!hasAllergies) missing.push("alergii/intolerante");
+
+  if (!hasLabsSnapshot(labs)) missing.push("analize de laborator");
+
+  return Array.from(new Set(missing));
+}
+
+function appendMissingInfoNotes(plan, missingInputs) {
+  const normalizedPlan = normalizeAiPlanShape(plan);
+  if (!normalizedPlan) return null;
+
+  const notes = Array.isArray(normalizedPlan.notes) ? [...normalizedPlan.notes] : [];
+  (missingInputs || []).forEach((field) => {
+    const note = `Lipsa: ${field}. S-a aplicat o presupunere conservatoare.`;
+    if (!notes.some((existing) => normalizeText(existing) === normalizeText(note))) {
+      notes.push(note);
+    }
+  });
+
+  return {
+    ...normalizedPlan,
+    notes,
+  };
+}
+
+function extractRestrictionTerms(profile) {
+  const profileObj = profile && typeof profile === "object" ? profile : {};
+  const raw = [profileObj?.allergies, profileObj?.dietary_prefs, profileObj?.dietaryPrefs]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  const terms = [];
+
+  raw.forEach((entry) => {
+    const segments = entry
+      .split(/[,;\n|/]+/)
+      .map((segment) => normalizeText(segment))
+      .map((segment) => segment.replace(/^fara\s+/, "").replace(/^intoleranta la\s+/, "").trim())
+      .filter((segment) => segment.length >= 3 && !GENERIC_RESTRICTION_TERMS.has(segment));
+    terms.push(...segments);
+  });
+
+  return Array.from(new Set(terms));
+}
+
+function foodHasExplicitQuantity(food) {
+  const text = String(food || "").trim();
+  if (!text) return false;
+  if (FOOD_QUANTITY_REGEX.test(text)) return true;
+  return /\b\d+(?:[.,]\d+)?\b/.test(text);
+}
+
+function extractFoodGrams(food) {
+  const match = String(food || "").match(FOOD_GRAMS_REGEX);
+  if (!match) return null;
+  return toNumber(match[1]);
+}
+
+function validateMacroConsistency(targets) {
+  const kcal = toNumber(targets?.kcal);
+  const protein = toNumber(targets?.protein);
+  const carbs = toNumber(targets?.carbs);
+  const fat = toNumber(targets?.fat);
+  const fibre = toNumber(targets?.fibre);
+  const errors = [];
+
+  const missingTargets = [
+    ["kcal", kcal],
+    ["protein", protein],
+    ["carbs", carbs],
+    ["fat", fat],
+    ["fibre", fibre],
+  ]
+    .filter(([, value]) => value === null)
+    .map(([name]) => name);
+  if (missingTargets.length > 0) {
+    errors.push(`Targets lipsa sau invalide: ${missingTargets.join(", ")}.`);
+    return errors;
+  }
+
+  if (kcal <= 0 || protein <= 0 || carbs <= 0 || fat <= 0 || fibre < 0) {
+    errors.push("Targets trebuie sa fie valori pozitive (fibre poate fi 0).");
+    return errors;
+  }
+
+  const expectedKcal = protein * 4 + carbs * 4 + fat * 9;
+  const maxDeviation = Math.max(120, kcal * 0.1);
+  const deviation = Math.abs(kcal - expectedKcal);
+  if (deviation > maxDeviation) {
+    errors.push(
+      `Inconsistenta macro/kcal: kcal=${Math.round(kcal)}, calcul macro=${Math.round(expectedKcal)} (abatere ${Math.round(deviation)}).`
+    );
+  }
+
+  return errors;
+}
+
+function validatePlanQuality(plan, profile, labs) {
+  const normalizedPlan = normalizeAiPlanShape(plan);
+  if (!normalizedPlan) return ["Plan invalid: weeklyPlan lipsa sau incomplet."];
+
+  const errors = [];
+  const weeklyPlan = normalizedPlan.weeklyPlan.slice(0, 7);
+
+  weeklyPlan.forEach((day, dayIndex) => {
+    const dayLabel = String(day?.day || `Ziua ${dayIndex + 1}`);
+    if (!Array.isArray(day?.meals)) {
+      errors.push(`${dayLabel}: meals lipsa.`);
+      return;
+    }
+
+    if (day.meals.length < 3 || day.meals.length > 5) {
+      errors.push(`${dayLabel}: numar mese invalid (${day.meals.length}). Sunt permise 3-5 mese/zi.`);
+    }
+
+    day.meals.forEach((meal, mealIndex) => {
+      const slot = String(meal?.slot || `Masa ${mealIndex + 1}`);
+      const foods = Array.isArray(meal?.foods) ? meal.foods : [];
+
+      if (!foods.length) {
+        errors.push(`${dayLabel} / ${slot}: foods lipsa.`);
+        return;
+      }
+
+      foods.forEach((food) => {
+        const text = String(food || "").trim();
+        if (!text) return;
+
+        if (!foodHasExplicitQuantity(text)) {
+          errors.push(`${dayLabel} / ${slot}: aliment fara cantitate explicita -> "${text}".`);
+        }
+
+        const grams = extractFoodGrams(text);
+        if (grams !== null && (grams < 10 || grams > 700)) {
+          errors.push(`${dayLabel} / ${slot}: cantitate improbabila (${grams}g) -> "${text}".`);
+        }
+      });
+    });
+  });
+
+  const bySignature = new Map();
+  weeklyPlan.forEach((day) => {
+    const signature = day.meals
+      .map((meal) => {
+        const foods = (meal.foods || []).map((food) => normalizeText(food)).join("|");
+        return `${normalizeText(meal.slot)}:${foods}`;
+      })
+      .join("||");
+    const current = bySignature.get(signature) || 0;
+    bySignature.set(signature, current + 1);
+  });
+  bySignature.forEach((count) => {
+    if (count > MAX_DAY_MENU_REPEATS) {
+      errors.push(`Meniu repetat identic in ${count} zile. Maxim permis: ${MAX_DAY_MENU_REPEATS}.`);
+    }
+  });
+
+  errors.push(...validateMacroConsistency(normalizedPlan.targets || {}));
+
+  if (!normalizedPlan.summary || normalizedPlan.summary.length < 40) {
+    errors.push("Summary prea scurt sau lipsa (minim 40 caractere).");
+  }
+
+  if (!normalizedPlan.disclaimer || normalizedPlan.disclaimer.length < 20) {
+    errors.push("Disclaimer lipsa sau prea scurt.");
+  }
+
+  const restrictions = extractRestrictionTerms(profile);
+  if (restrictions.length > 0) {
+    weeklyPlan.forEach((day) => {
+      day.meals.forEach((meal) => {
+        meal.foods.forEach((food) => {
+          const normalizedFood = normalizeText(food);
+          restrictions.forEach((term) => {
+            if (term && normalizedFood.includes(term)) {
+              errors.push(`Restrictie incalcata (${term}) in alimentul "${food}".`);
+            }
+          });
+        });
+      });
+    });
+  }
+
+  const missingInputs = inferMissingPlanInputs(profile, labs);
+  const notesNormalized = new Set((normalizedPlan.notes || []).map((note) => normalizeText(note)));
+  missingInputs.forEach((field) => {
+    const expectedPrefix = normalizeText(`Lipsa: ${field}`);
+    const hasMissingNote = Array.from(notesNormalized).some((note) => note.startsWith(expectedPrefix));
+    if (!hasMissingNote) {
+      errors.push(`Lipseste nota obligatorie pentru campul necompletat: ${field}.`);
+    }
+  });
+
+  return Array.from(new Set(errors)).slice(0, 25);
+}
+
+function buildPlanPromptContext(profile, labs) {
+  const missingInputs = inferMissingPlanInputs(profile, labs);
+  return {
+    systemPrompt:
+      "Esti nutritionist sportiv clinician. Generezi EXCLUSIV pe baza datelor primite. Nu inventa analize, diagnostice, alergii, preferinte, alimente sau restrictii. Daca lipsesc informatii, mentioneaza explicit in notes cu prefixul 'Lipsa:' si aplica presupuneri conservatoare. Returneaza DOAR JSON valid conform schemei.",
+    userPayload: {
+      profile,
+      labs,
+      locale: "ro",
+      missingInputs,
+      constraints: [
+        "Raspunsul trebuie sa fie obiect JSON valid.",
+        "weeklyPlan are exact 7 zile.",
+        "Fiecare zi are 3-5 mese.",
+        "Fiecare aliment trebuie sa aiba cantitate explicita (g/ml/buc).",
+        "Respecta strict alergiile/intolerantele si preferintele alimentare din profil.",
+        "Nu repeta acelasi meniu identic mai mult de 2 zile.",
+        "Include targets (kcal, protein, carbs, fat, fibre).",
+        "Consistenta calorica: kcal ~ 4*protein + 4*carbs + 9*fat (abatere max 10%).",
+        "Include summary, notes, fitness, shoppingList, disclaimer.",
+        "Nu include markdown, explicatii in afara JSON-ului sau campuri in plus.",
+      ],
+    },
+  };
+}
+
+function buildPlanRepairPromptContext(profile, labs, invalidPlan, validationErrors) {
+  const missingInputs = inferMissingPlanInputs(profile, labs);
+  return {
+    systemPrompt:
+      "Esti nutritionist sportiv clinician. Corectezi un plan alimentar JSON invalid. Nu inventa date noi; foloseste exclusiv informatiile din profile/labs/plan si corecteaza minimul necesar. Returneaza doar JSON valid conform schemei.",
+    userPayload: {
+      locale: "ro",
+      profile,
+      labs,
+      missingInputs,
+      invalidPlan,
+      validationErrors,
+      instructions: [
+        "Pastreaza structura JSON si corecteaza doar erorile raportate.",
+        "Fiecare zi trebuie sa aiba 3-5 mese.",
+        "Fiecare aliment trebuie sa includa cantitate explicita.",
+        "Respecta strict alergiile/intolerantele.",
+        "Asigura consistenta targets kcal/macros.",
+        "Nu adauga explicatii in afara JSON-ului.",
+      ],
+    },
+  };
+}
+
+function extractGoogleOutputText(payload) {
+  const parts = payload?.candidates?.[0]?.content?.parts;
+  if (!Array.isArray(parts)) return "";
+
+  return parts
+    .map((part) => (typeof part?.text === "string" ? part.text.trim() : ""))
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+}
+
+async function callGoogleForPlan(profile, labs) {
+  if (!GOOGLE_API_KEY) return null;
+
+  const { systemPrompt, userPayload } = buildPlanPromptContext(profile, labs);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), GOOGLE_TIMEOUT_MS);
+  const model = encodeURIComponent(GOOGLE_PLAN_MODEL);
+  const key = encodeURIComponent(GOOGLE_API_KEY);
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: systemPrompt }],
+        },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: JSON.stringify(userPayload) }],
+          },
+        ],
+        generationConfig: {
+          temperature: PLAN_TEMPERATURE,
+          responseMimeType: "application/json",
+          responseJsonSchema: GOOGLE_PLAN_RESPONSE_JSON_SCHEMA,
+        },
+      }),
+    });
+
+    if (!response.ok) return null;
+
+    const payload = await response.json();
+    const content = extractGoogleOutputText(payload);
+    const parsed = extractJsonCandidate(content);
+    if (!parsed || typeof parsed !== "object") return null;
+
+    const plan = normalizeAiPlanShape(parsed.plan || parsed);
+    if (!hasValidWeeklyPlan(plan)) return null;
+
+    return plan;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function callGoogleRepairForPlan(profile, labs, invalidPlan, validationErrors) {
+  if (!GOOGLE_API_KEY) return null;
+
+  const { systemPrompt, userPayload } = buildPlanRepairPromptContext(profile, labs, invalidPlan, validationErrors);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), GOOGLE_TIMEOUT_MS);
+  const model = encodeURIComponent(GOOGLE_PLAN_MODEL);
+  const key = encodeURIComponent(GOOGLE_API_KEY);
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: systemPrompt }],
+        },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: JSON.stringify(userPayload) }],
+          },
+        ],
+        generationConfig: {
+          temperature: PLAN_TEMPERATURE,
+          responseMimeType: "application/json",
+          responseJsonSchema: GOOGLE_PLAN_RESPONSE_JSON_SCHEMA,
+        },
+      }),
+    });
+
+    if (!response.ok) return null;
+
+    const payload = await response.json();
+    const content = extractGoogleOutputText(payload);
+    const parsed = extractJsonCandidate(content);
+    if (!parsed || typeof parsed !== "object") return null;
+
+    const plan = normalizeAiPlanShape(parsed.plan || parsed);
+    if (!hasValidWeeklyPlan(plan)) return null;
+
+    return plan;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function callOpenAiResponsesApi(systemPrompt, userPayload, signal) {
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    signal,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: OPENAI_PLAN_MODEL,
+      temperature: PLAN_TEMPERATURE,
+      max_output_tokens: PLAN_MAX_OUTPUT_TOKENS,
+      input: [
+        {
+          role: "system",
+          content: [{ type: "input_text", text: systemPrompt }],
+        },
+        {
+          role: "user",
+          content: [{ type: "input_text", text: JSON.stringify(userPayload) }],
+        },
+      ],
+      text: {
+        format: OPENAI_PLAN_TEXT_FORMAT,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json();
+}
+
+async function callOpenAiChatCompletionsApi(systemPrompt, userPayload, signal) {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    signal,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: OPENAI_PLAN_MODEL,
+      temperature: PLAN_TEMPERATURE,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: JSON.stringify(userPayload) },
+      ],
+    }),
+  });
+
+  if (!response.ok) return null;
+
+  const payload = await response.json();
+  return payload?.choices?.[0]?.message?.content || "";
+}
+
+async function callOpenAiRepairForPlan(profile, labs, invalidPlan, validationErrors) {
+  if (!OPENAI_API_KEY) return null;
+
+  const { systemPrompt, userPayload } = buildPlanRepairPromptContext(profile, labs, invalidPlan, validationErrors);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
+  try {
+    const responsesPayload = await callOpenAiResponsesApi(systemPrompt, userPayload, controller.signal);
+    const responseParsed = extractResponsesParsedObject(responsesPayload);
+    const responseText = extractResponsesOutputText(responsesPayload);
+    const parsedFromResponses = responseParsed || extractJsonCandidate(responseText);
+    if (parsedFromResponses && typeof parsedFromResponses === "object") {
+      const repaired = normalizeAiPlanShape(parsedFromResponses.plan || parsedFromResponses);
+      if (hasValidWeeklyPlan(repaired)) return repaired;
+    }
+
+    const legacyContent = await callOpenAiChatCompletionsApi(systemPrompt, userPayload, controller.signal);
+    const parsed = extractJsonCandidate(legacyContent);
+    if (!parsed || typeof parsed !== "object") return null;
+
+    const repaired = normalizeAiPlanShape(parsed.plan || parsed);
+    if (!hasValidWeeklyPlan(repaired)) return null;
+
+    return repaired;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function callOpenAiForPlan(profile, labs) {
+  if (!OPENAI_API_KEY) return null;
+  const { systemPrompt, userPayload } = buildPlanPromptContext(profile, labs);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
+  try {
+    const responsesPayload = await callOpenAiResponsesApi(systemPrompt, userPayload, controller.signal);
+    const responseParsed = extractResponsesParsedObject(responsesPayload);
+    const responseText = extractResponsesOutputText(responsesPayload);
+    const parsedFromResponses = responseParsed || extractJsonCandidate(responseText);
+    if (parsedFromResponses && typeof parsedFromResponses === "object") {
+      const responsesPlan = normalizeAiPlanShape(parsedFromResponses.plan || parsedFromResponses);
+      if (hasValidWeeklyPlan(responsesPlan)) {
+        return responsesPlan;
+      }
+    }
+
+    const legacyContent = await callOpenAiChatCompletionsApi(systemPrompt, userPayload, controller.signal);
+    const parsed = extractJsonCandidate(legacyContent);
+    if (!parsed || typeof parsed !== "object") return null;
+
+    const plan = normalizeAiPlanShape(parsed.plan || parsed);
+    if (!hasValidWeeklyPlan(plan)) return null;
+
+    return plan;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function getRepairProviderOrder(preferredProvider = "base44") {
+  const normalized = String(preferredProvider || "base44").toLowerCase();
+  const order = [];
+
+  if (normalized === "google") {
+    order.push("google", "openai");
+  } else if (normalized === "openai") {
+    order.push("openai", "google");
+  } else {
+    order.push("google", "openai");
+  }
+
+  return order.filter((provider, index) => order.indexOf(provider) === index);
+}
+
+async function repairPlanCandidate(plan, profile, labs, validationErrors, preferredProvider = "base44") {
+  let currentPlan = normalizeAiPlanShape(plan);
+  if (!currentPlan) return null;
+
+  let errors = Array.isArray(validationErrors) ? [...validationErrors] : validatePlanQuality(currentPlan, profile, labs);
+  if (!errors.length) return currentPlan;
+
+  const order = getRepairProviderOrder(preferredProvider);
+
+  for (let attempt = 0; attempt < MAX_PLAN_REPAIR_ATTEMPTS; attempt += 1) {
+    let repaired = null;
+
+    for (const provider of order) {
+      if (provider === "google") {
+        repaired = await callGoogleRepairForPlan(profile, labs, currentPlan, errors);
+      } else if (provider === "openai") {
+        repaired = await callOpenAiRepairForPlan(profile, labs, currentPlan, errors);
+      }
+
+      if (repaired) break;
+    }
+
+    if (!repaired) return null;
+
+    currentPlan = normalizeAiPlanShape(repaired);
+    if (!currentPlan) return null;
+
+    const missingInputs = inferMissingPlanInputs(profile, labs);
+    currentPlan = appendMissingInfoNotes(currentPlan, missingInputs);
+    if (!currentPlan) return null;
+
+    errors = validatePlanQuality(currentPlan, profile, labs);
+    if (!errors.length) return currentPlan;
+  }
+
+  return null;
+}
+
+async function finalizePlanCandidate(candidatePlan, profile, labs, source = "base44") {
+  const normalized = normalizeAiPlanShape(candidatePlan);
+  if (!normalized) return null;
+
+  const missingInputs = inferMissingPlanInputs(profile, labs);
+  const enriched = appendMissingInfoNotes(normalized, missingInputs);
+  if (!enriched) return null;
+
+  const errors = validatePlanQuality(enriched, profile, labs);
+  if (!errors.length) return enriched;
+
+  return repairPlanCandidate(enriched, profile, labs, errors, source);
+}
+
 export async function generatePlanWithAI(profile, labs) {
   const payload = { profile, labs, locale: "ro" };
   const result = await callAi("/generate-plan", payload);
+  const base44Plan = await finalizePlanCandidate(result?.plan || result, profile, labs, "base44");
+  if (base44Plan) return base44Plan;
 
-  if (!result || typeof result !== "object") return null;
+  const googleRawPlan = await callGoogleForPlan(profile, labs);
+  const googlePlan = await finalizePlanCandidate(googleRawPlan, profile, labs, "google");
+  if (googlePlan) return googlePlan;
 
-  const plan = result.plan || result;
-  if (!plan || typeof plan !== "object") return null;
+  const openAiRawPlan = await callOpenAiForPlan(profile, labs);
+  const openAiPlan = await finalizePlanCandidate(openAiRawPlan, profile, labs, "openai");
+  if (openAiPlan) return openAiPlan;
 
-  return plan;
+  return null;
 }
 
 export async function summarizeContentItemWithAI(article) {

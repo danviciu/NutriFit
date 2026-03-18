@@ -39,7 +39,30 @@ export function AuthProvider({ children }) {
   };
 
   const signUp = async ({ email, password }) => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const emailRedirectTo =
+      typeof window !== "undefined" ? `${window.location.origin}/login` : undefined;
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo },
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const resendSignupConfirmation = async (email) => {
+    const normalizedEmail = String(email || "").trim();
+    if (!normalizedEmail) throw new Error("Email invalid");
+
+    const emailRedirectTo =
+      typeof window !== "undefined" ? `${window.location.origin}/login` : undefined;
+
+    const { data, error } = await supabase.auth.resend({
+      type: "signup",
+      email: normalizedEmail,
+      options: { emailRedirectTo },
+    });
     if (error) throw error;
     return data;
   };
@@ -57,6 +80,7 @@ export function AuthProvider({ children }) {
       accessToken: session?.access_token || null,
       signIn,
       signUp,
+      resendSignupConfirmation,
       signOut,
     }),
     [session, user, loading],

@@ -58,7 +58,7 @@ body::after {
 
 body::before {
   inset: 0;
-  opacity: 0.38;
+  opacity: 0.1;
   background-image: var(--hex-pattern);
   mask-image: radial-gradient(circle at 50% 30%, black 46%, transparent 84%);
 }
@@ -92,6 +92,7 @@ h6 {
 
 .app-shell {
   position: relative;
+  isolation: isolate;
 }
 
 .app-shell::before {
@@ -103,6 +104,7 @@ h6 {
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   pointer-events: none;
+  z-index: -1;
 }
 
 .app-shell--frameless::before {
@@ -111,18 +113,18 @@ h6 {
 
 .glass-panel,
 .surface-card {
-  border: 1px solid var(--glass-border);
-  background-color: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background-color: rgba(255, 255, 255, 0.995);
   backdrop-filter: blur(12px);
-  box-shadow: 0 10px 30px rgba(13, 148, 136, 0.1);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   color: var(--text-body);
 }
 
 .glass-card {
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background-color: rgba(255, 255, 255, 0.995);
   backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(13, 148, 136, 0.08);
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
   color: var(--text-body);
 }
 
@@ -288,19 +290,19 @@ h6 {
 }
 
 .text-slate-400 {
-  color: #25364c !important;
+  color: #172b41 !important;
 }
 
 .text-slate-500 {
-  color: #1b2b3f !important;
+  color: #11263b !important;
 }
 
 .text-slate-600 {
-  color: #132238 !important;
+  color: #0e2237 !important;
 }
 
 .text-slate-700 {
-  color: #0d1a2d !important;
+  color: #091c2f !important;
 }
 
 .text-slate-800 {
@@ -308,7 +310,7 @@ h6 {
 }
 
 .text-slate-300 {
-  color: #334155 !important;
+  color: #1f3349 !important;
 }
 
 .text-teal-600 {
@@ -317,22 +319,28 @@ h6 {
 
 .text-gray-300,
 .text-zinc-300 {
-  color: #334155 !important;
+  color: #1f344a !important;
 }
 
 .text-gray-400,
 .text-zinc-400 {
-  color: #25364c !important;
+  color: #172b41 !important;
 }
 
 .text-gray-500,
 .text-zinc-500 {
-  color: #1b2b3f !important;
+  color: #11263b !important;
 }
 
 .text-gray-600,
 .text-zinc-600 {
-  color: #132238 !important;
+  color: #0e2237 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #3b526b;
+  opacity: 1;
 }
 
 .text-white\/70 {

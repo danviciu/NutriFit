@@ -1,11 +1,10 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   addContentBookmark,
   getContentBookmarks,
   getContentItems,
   getContentTopics,
-  getProgressSummary,
   getRecommendedContent,
   logUserEvent,
   refreshContent,
@@ -14,8 +13,6 @@ import {
 import { useAuth } from "@/lib/AuthContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 
 const TOPIC_THEME = {
   nutrition: { label: "Nutritie", mood: "Optimizare alimentara", chipClass: "bg-emerald-50 text-emerald-700" },
@@ -134,11 +131,6 @@ function filterItems(rows, { selectedTopic, searchText, feedMode, bookmarkSlugs 
   });
 }
 
-function countAction(topActions, actionName) {
-  const hit = (topActions || []).find((entry) => entry?.name === actionName);
-  return Number(hit?.count || 0);
-}
-
 export default function Discover() {
   const { accessToken, user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -147,12 +139,11 @@ export default function Discover() {
   const [error, setError] = useState("");
   const [items, setItems] = useState([]);
   const [topics, setTopics] = useState([]);
-  const [selectedTopic, setSelectedTopic] = useState("");
-  const [search, setSearch] = useState("");
-  const [feedMode, setFeedMode] = useState("all");
+  const selectedTopic = "";
+  const search = "";
+  const feedMode = "all";
   const [bookmarkSlugs, setBookmarkSlugs] = useState(new Set());
   const [lastSyncedAt, setLastSyncedAt] = useState("");
-  const [engagement, setEngagement] = useState({ reads7d: 0, opens7d: 0, adherence: 0 });
 
   const fetchBookmarks = async () => {
     if (!accessToken || !user) {
@@ -165,27 +156,6 @@ export default function Discover() {
 
   useEffect(() => {
     fetchBookmarks().catch(() => {});
-  }, [accessToken, user]);
-
-  useEffect(() => {
-    if (!accessToken || !user) {
-      setEngagement({ reads7d: 0, opens7d: 0, adherence: 0 });
-      return;
-    }
-
-    getProgressSummary(accessToken, 7)
-      .then((resp) => {
-        const topActions = resp?.topActions || [];
-        const adherence = Number(resp?.summary?.adherenceScore || 0);
-        setEngagement({
-          reads7d: countAction(topActions, "content_read"),
-          opens7d: countAction(topActions, "content_open"),
-          adherence,
-        });
-      })
-      .catch(() => {
-        setEngagement((prev) => ({ ...prev, adherence: 0 }));
-      });
   }, [accessToken, user]);
 
   useEffect(() => {
@@ -253,18 +223,6 @@ export default function Discover() {
     };
   }, [selectedTopic, search, feedMode, accessToken, user, bookmarkSlugs]);
 
-  const topicStats = useMemo(() => {
-    const counts = {};
-    items.forEach((item) => {
-      const key = item.topic || "default";
-      counts[key] = (counts[key] || 0) + 1;
-    });
-    return Object.entries(counts)
-      .map(([topic, count]) => ({ topic, count }))
-      .sort((a, b) => b.count - a.count);
-  }, [items]);
-
-  const newestDate = useMemo(() => (items.length ? formatDate(items[0].published_at) : "-"), [items]);
   const featured = items[0] || null;
   const gridItems = items.slice(1, 10);
   const latestItems = items.slice(10, 16);
@@ -339,117 +297,21 @@ export default function Discover() {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-        <div>
-          <h1 className="text-4xl font-extrabold text-slate-900">Descopera articole health-tech</h1>
-          <p className="mt-2 max-w-2xl text-slate-600">
-            Resurse validate stiintific despre nutritie, exercitii, antrenamente si recuperare.
-          </p>
-        </div>
-        <div className="min-w-[280px] rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_8px_24px_rgba(13,148,136,0.08)]">
-          <p className="flex items-center justify-between text-sm">
-            <span className="text-slate-700">Articole afisate</span>
-            <span className="font-semibold text-slate-900">{items.length}</span>
-          </p>
-          <p className="mt-1 flex items-center justify-between text-sm">
-            <span className="text-slate-700">Topicuri active</span>
-            <span className="font-semibold text-slate-900">{topics.length}</span>
-          </p>
-          <p className="mt-1 flex items-center justify-between text-sm">
-            <span className="text-slate-700">Ultima publicare</span>
-            <span className="font-semibold text-slate-900">{newestDate}</span>
-          </p>
-          {lastSyncedAt ? (
-            <p className="mt-2 text-xs font-medium text-slate-600">Ultima sincronizare: {formatDateTime(lastSyncedAt)}</p>
-          ) : null}
-          {user ? (
-            <Button className="mt-3 w-full" onClick={handleRefresh} disabled={refreshing}>
+      <div>
+        <h1 className="text-4xl font-extrabold text-slate-900">Descopera articole health-tech</h1>
+        <p className="mt-2 max-w-2xl text-slate-600">
+          Resurse validate stiintific despre nutritie, exercitii, antrenamente si recuperare.
+        </p>
+        {lastSyncedAt ? (
+          <p className="mt-2 text-xs font-medium text-slate-600">Ultima sincronizare: {formatDateTime(lastSyncedAt)}</p>
+        ) : null}
+        {user ? (
+          <div className="mt-4">
+            <Button onClick={handleRefresh} disabled={refreshing}>
               {refreshing ? "Actualizare..." : "Actualizeaza acum"}
             </Button>
-          ) : null}
-        </div>
-      </div>
-
-      {user ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="glass-card rounded-2xl p-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Citiri 7 zile</p>
-            <p className="mt-2 text-3xl font-black text-slate-900">{engagement.reads7d}</p>
           </div>
-          <div className="glass-card rounded-2xl p-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Deschideri articole</p>
-            <p className="mt-2 text-3xl font-black text-slate-900">{engagement.opens7d}</p>
-          </div>
-          <div className="glass-card rounded-2xl p-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Aderenta generala</p>
-            <p className="mt-2 text-3xl font-black text-slate-900">{engagement.adherence}%</p>
-          </div>
-        </div>
-      ) : null}
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.3fr_0.7fr]">
-        <div className="glass-card rounded-[2rem] p-5">
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-500">Topic</p>
-              <Select value={selectedTopic} onChange={(event) => setSelectedTopic(event.target.value)}>
-                <option value="">Toate topicurile</option>
-                {topics.map((topic) => (
-                  <option key={topic} value={topic}>
-                    {getTheme(topic).label}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-slate-500">Cauta</p>
-              <Input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="ex: glicemie, antrenament, recuperare"
-              />
-            </div>
-          </div>
-          {user ? (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button variant={feedMode === "all" ? "default" : "outline"} onClick={() => setFeedMode("all")}>
-                Toate
-              </Button>
-              <Button
-                variant={feedMode === "recommended" ? "default" : "outline"}
-                onClick={() => setFeedMode("recommended")}
-              >
-                Recomandate
-              </Button>
-              <Button variant={feedMode === "saved" ? "default" : "outline"} onClick={() => setFeedMode("saved")}>
-                Salvate
-              </Button>
-              <span className="badge-pill">{bookmarkSlugs.size} salvate</span>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="glass-card rounded-[2rem] p-5">
-          <h3 className="text-2xl font-bold text-slate-900">Distribuire topicuri</h3>
-          <div className="mt-4 space-y-3">
-            {!topicStats.length ? <p className="text-sm text-slate-600">Nu exista date inca.</p> : null}
-            {topicStats.map((entry) => {
-              const width = Math.max(12, Math.round((entry.count / Math.max(items.length, 1)) * 100));
-              const theme = getTheme(entry.topic);
-              return (
-                <div key={entry.topic}>
-                  <div className="mb-1 flex items-center justify-between text-sm">
-                    <span>{theme.label}</span>
-                    <span className="font-semibold">{entry.count}</span>
-                  </div>
-                  <div className="chart-track">
-                    <div className="chart-fill" style={{ width: `${width}%` }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        ) : null}
       </div>
 
       {error ? (
@@ -574,3 +436,4 @@ export default function Discover() {
     </div>
   );
 }
+

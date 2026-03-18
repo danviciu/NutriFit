@@ -12,7 +12,13 @@ import { createClient } from "@supabase/supabase-js";
 import { extractLabsWithAI, generatePlanWithAI } from "./ai.js";
 import { collectWeeklyContent, isHealthRelevantContentPayload } from "./content.js";
 import { ensureSevenDayPlan, generateLocalPlan } from "./localPlan.js";
-import { dailyCheckinSchema, notificationPreferencesSchema, profileSchema, userEventSchema } from "./schema.js";
+import {
+  dailyCheckinSchema,
+  notificationPreferencesSchema,
+  profileSchema,
+  subscriptionChangeSchema,
+  userEventSchema,
+} from "./schema.js";
 
 dotenv.config({ path: "./server/.env" });
 dotenv.config({ path: "./.env.local" });
@@ -24,6 +30,15 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const NOTIFY_FROM_EMAIL = process.env.NOTIFY_FROM_EMAIL || "";
+const AI_PLAN_REQUIRED = String(process.env.AI_PLAN_REQUIRED || "true").toLowerCase() !== "false";
+const BILLING_CURRENCY = String(process.env.BILLING_CURRENCY || "RON").toUpperCase();
+const PRO_MONTHLY_PRICE = Number.isFinite(Number(process.env.PRO_MONTHLY_PRICE))
+  ? Math.max(1, Math.round(Number(process.env.PRO_MONTHLY_PRICE)))
+  : 49;
+const FREE_PLAN_MONTHLY_LIMIT = Number.isFinite(Number(process.env.FREE_PLAN_MONTHLY_LIMIT))
+  ? Math.max(0, Math.round(Number(process.env.FREE_PLAN_MONTHLY_LIMIT)))
+  : 2;
+const PRO_PLAN_CODE = "pro_monthly";
 
 function looksLikePlaceholder(value) {
   return !value || value.includes("your-") || value.includes("YOUR_");
@@ -291,6 +306,146 @@ function computeCurrentStreak(daySet) {
     streak += 1;
   }
   return streak;
+}
+
+function isMissingRelationError(error, relationName) {
+  const message = String(error?.message || "").toLowerCase();
+  return message.includes("does not exist") && message.includes(String(relationName || "").toLowerCase());
+}
+
+function getBillingPlansCatalog() {
+  return [
+    {
+      code: "free",
+      name: "Free",
+      currency: BILLING_CURRENCY,
+      monthlyPrice: 0,
+      monthlyPlanGenerationLimit: FREE_PLAN_MONTHLY_LIMIT,
+      recommended: false,
+      features: [
+        "Plan alimentar personalizat",
+        "Acces la Discover",
+        `Pana la ${FREE_PLAN_MONTHLY_LIMIT} regenerari plan/luna`,
+      ],
+    },
+    {
+      code: PRO_PLAN_CODE,
+      name: "Pro lunar",
+      currency: BILLING_CURRENCY,
+      monthlyPrice: PRO_MONTHLY_PRICE,
+      monthlyPlanGenerationLimit: null,
+      recommended: true,
+      features: [
+        "Regenerari plan nelimitate",
+        "Prioritate pe ajustari din check-in",
+        "Suport extins pentru monitorizare",
+      ],
+    },
+  ];
+}
+
+function normalizeIsoOrNull(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
+function getCurrentMonthWindow(referenceDate = new Date()) {
+  const year = referenceDate.getUTCFullYear();
+  const month = referenceDate.getUTCMonth();
+  const start = new Date(Date.UTC(year, month, 1));
+  const end = new Date(Date.UTC(year, month + 1, 1));
+  return {
+    startIso: start.toISOString(),
+    endIso: end.toISOString(),
+  };
+}
+
+function isSubscriptionActive(row, referenceDate = new Date()) {
+  if (!row) return false;
+  const status = String(row.status || "").toLowerCase();
+  if (status !== "active" && status !== "trialing") return false;
+
+  const periodEnd = normalizeIsoOrNull(row.current_period_end);
+  if (!periodEnd) return true;
+  return new Date(periodEnd).getTime() > referenceDate.getTime();
+}
+
+function getEffectiveSubscriptionStatus(row, active) {
+  if (!row) return "free";
+  if (active) return String(row.status || "active").toLowerCase();
+
+  const periodEnd = normalizeIsoOrNull(row.current_period_end);
+  if (periodEnd && new Date(periodEnd).getTime() <= Date.now()) return "expired";
+  return String(row.status || "inactive").toLowerCase();
+}
+
+async function getUserSubscriptionRow(client, userId) {
+  const { data, error } = await client
+    .from("user_subscriptions")
+    .select(
+      "user_id, plan_code, status, provider, provider_customer_id, provider_subscription_id, started_at, current_period_start, current_period_end, cancel_at_period_end, updated_at"
+    )
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    if (isMissingRelationError(error, "user_subscriptions")) return null;
+    throw new Error(error.message);
+  }
+
+  return data || null;
+}
+
+async function countGeneratedPlansInWindow(client, userId, startIso, endIso) {
+  const { count, error } = await client
+    .from("plans")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startIso)
+    .lt("created_at", endIso);
+
+  if (error) throw new Error(error.message);
+  return Number(count || 0);
+}
+
+async function buildSubscriptionSnapshot(client, userId) {
+  const now = new Date();
+  const row = await getUserSubscriptionRow(client, userId);
+  const active = isSubscriptionActive(row, now);
+  const planCode = active ? String(row?.plan_code || PRO_PLAN_CODE) : "free";
+  const monthWindow = getCurrentMonthWindow(now);
+
+  const paidWindow = {
+    startIso: normalizeIsoOrNull(row?.current_period_start) || monthWindow.startIso,
+    endIso: normalizeIsoOrNull(row?.current_period_end) || monthWindow.endIso,
+  };
+  const usageWindow = active && planCode !== "free" ? paidWindow : monthWindow;
+  const plansGenerated = await countGeneratedPlansInWindow(client, userId, usageWindow.startIso, usageWindow.endIso);
+  const monthlyLimit = active && planCode !== "free" ? null : FREE_PLAN_MONTHLY_LIMIT;
+  const remaining = monthlyLimit === null ? null : Math.max(0, monthlyLimit - plansGenerated);
+
+  return {
+    subscription: {
+      planCode,
+      status: getEffectiveSubscriptionStatus(row, active),
+      isActive: active,
+      cancelAtPeriodEnd: Boolean(row?.cancel_at_period_end),
+      provider: row?.provider || null,
+      startedAt: normalizeIsoOrNull(row?.started_at),
+      currentPeriodStart: usageWindow.startIso,
+      currentPeriodEnd: usageWindow.endIso,
+    },
+    usage: {
+      plansGenerated,
+      monthlyLimit,
+      remaining,
+      windowStart: usageWindow.startIso,
+      windowEnd: usageWindow.endIso,
+    },
+    plans: getBillingPlansCatalog(),
+  };
 }
 
 function goalTopicWeights(goal) {
@@ -992,7 +1147,152 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true, service: "nutrifit-server" });
 });
 
-app.post("/suggest", async (req, res) => {
+app.get("/billing/plans", (_req, res) => {
+  res.json({ plans: getBillingPlansCatalog() });
+});
+
+app.get("/me/subscription", requireAuth, async (req, res, next) => {
+  try {
+    const snapshot = await buildSubscriptionSnapshot(req.sb, req.user.id);
+    res.json(snapshot);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/me/subscription/activate", requireAuth, async (req, res, next) => {
+  try {
+    const payload = subscriptionChangeSchema.parse(req.body || {});
+    const planCode = payload.planCode || PRO_PLAN_CODE;
+    if (planCode !== PRO_PLAN_CODE) {
+      return res.status(400).json({ error: "Plan invalid", code: "INVALID_PLAN_CODE" });
+    }
+
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const periodEndIso = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const existing = await getUserSubscriptionRow(req.sb, req.user.id);
+    const startedAt = normalizeIsoOrNull(existing?.started_at) || nowIso;
+
+    const { error } = await req.sb.from("user_subscriptions").upsert(
+      {
+        user_id: req.user.id,
+        plan_code: planCode,
+        status: "active",
+        provider: "manual",
+        started_at: startedAt,
+        current_period_start: nowIso,
+        current_period_end: periodEndIso,
+        cancel_at_period_end: false,
+        updated_at: nowIso,
+      },
+      { onConflict: "user_id" },
+    );
+
+    if (error) {
+      if (isMissingRelationError(error, "user_subscriptions")) {
+        return res
+          .status(503)
+          .json({ error: "Schema billing lipseste. Ruleaza server/supabase.sql.", code: "SUBSCRIPTION_SCHEMA_MISSING" });
+      }
+      throw new Error(error.message);
+    }
+
+    await req.sb
+      .from("user_events")
+      .insert({
+        user_id: req.user.id,
+        event_name: "subscription_activated",
+        page: "/plan",
+        metadata: {
+          planCode,
+          provider: "manual",
+          periodEnd: periodEndIso,
+        },
+        occurred_at: nowIso,
+      })
+      .then(() => {})
+      .catch(() => {});
+
+    const snapshot = await buildSubscriptionSnapshot(req.sb, req.user.id);
+    res.json({ ok: true, ...snapshot });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/me/subscription/cancel", requireAuth, async (req, res, next) => {
+  try {
+    const nowIso = new Date().toISOString();
+    const { data, error } = await req.sb
+      .from("user_subscriptions")
+      .update({
+        cancel_at_period_end: true,
+        updated_at: nowIso,
+      })
+      .eq("user_id", req.user.id)
+      .in("status", ["active", "trialing"])
+      .select("user_id")
+      .maybeSingle();
+
+    if (error) {
+      if (isMissingRelationError(error, "user_subscriptions")) {
+        return res
+          .status(503)
+          .json({ error: "Schema billing lipseste. Ruleaza server/supabase.sql.", code: "SUBSCRIPTION_SCHEMA_MISSING" });
+      }
+      throw new Error(error.message);
+    }
+
+    if (!data?.user_id) {
+      return res.status(400).json({ error: "Nu exista abonament activ pentru anulare.", code: "NO_ACTIVE_SUBSCRIPTION" });
+    }
+
+    const snapshot = await buildSubscriptionSnapshot(req.sb, req.user.id);
+    res.json({ ok: true, ...snapshot });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/me/subscription/reactivate", requireAuth, async (req, res, next) => {
+  try {
+    const nowIso = new Date().toISOString();
+    const { data, error } = await req.sb
+      .from("user_subscriptions")
+      .update({
+        cancel_at_period_end: false,
+        updated_at: nowIso,
+      })
+      .eq("user_id", req.user.id)
+      .in("status", ["active", "trialing"])
+      .select("user_id")
+      .maybeSingle();
+
+    if (error) {
+      if (isMissingRelationError(error, "user_subscriptions")) {
+        return res
+          .status(503)
+          .json({ error: "Schema billing lipseste. Ruleaza server/supabase.sql.", code: "SUBSCRIPTION_SCHEMA_MISSING" });
+      }
+      throw new Error(error.message);
+    }
+
+    if (!data?.user_id) {
+      return res
+        .status(400)
+        .json({ error: "Nu exista abonament activ care poate fi reactivat.", code: "NO_ACTIVE_SUBSCRIPTION" });
+    }
+
+    const snapshot = await buildSubscriptionSnapshot(req.sb, req.user.id);
+    res.json({ ok: true, ...snapshot });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/suggest", requireAuth, async (req, res) => {
   const profile = req.body?.profileDraft || {};
   const goal = profile.goal === "lose" ? "deficit controlat" : profile.goal === "gain" ? "surplus moderat" : "echilibru caloric";
   const suggestion = `Sugestie rapida: mentine ${goal}, prioritizeaza proteina la fiecare masa si monitorizeaza hidratarea.`;
@@ -1925,16 +2225,41 @@ app.post("/generate-plan", requireAuth, async (req, res) => {
       return res.status(400).json({ error: "No profile available" });
     }
 
+    const subscriptionSnapshot = await buildSubscriptionSnapshot(req.sb, req.user.id);
+    const reachedMonthlyLimit =
+      subscriptionSnapshot.usage.monthlyLimit !== null &&
+      subscriptionSnapshot.usage.plansGenerated >= subscriptionSnapshot.usage.monthlyLimit;
+    if (reachedMonthlyLimit) {
+      return res.status(402).json({
+        error: "Ai atins limita lunara pentru planul Free. Activeaza Pro lunar pentru regenerari nelimitate.",
+        code: "SUBSCRIPTION_REQUIRED",
+        ...subscriptionSnapshot,
+      });
+    }
+
     const latestLabs = await getLatestLabs(req.sb, req.user.id);
     const labsSnapshot = latestLabs?.extracted_json || null;
     const recentCheckins = await getRecentCheckins(req.sb, req.user.id, 7);
     const checkinInsights = buildCheckinInsights(recentCheckins, profile?.goal);
 
     const aiPlan = await generatePlanWithAI(profile, labsSnapshot);
+    if (!aiPlan && AI_PLAN_REQUIRED) {
+      return res.status(503).json({
+        error:
+          "Generarea AI este obligatorie dar indisponibila. Configureaza un provider AI valid (BASE44_API_URL extern, GOOGLE_API_KEY sau OPENAI_API_KEY).",
+      });
+    }
+
     const basePlan = aiPlan
       ? ensureSevenDayPlan(aiPlan, profile, labsSnapshot)
       : generateLocalPlan(profile, labsSnapshot);
     const plan = applyCheckinAdjustments(basePlan, checkinInsights);
+    plan.meta = {
+      ...(plan.meta || {}),
+      generationSource: aiPlan ? "ai" : "local-fallback",
+      aiRequired: AI_PLAN_REQUIRED,
+      generatedAt: new Date().toISOString(),
+    };
 
     const { data: planRow, error } = await req.sb
       .from("plans")

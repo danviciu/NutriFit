@@ -17,7 +17,7 @@ export const profileSchema = z.object({
 export const userEventSchema = z.object({
   eventName: z.string().min(1).max(80),
   page: z.string().max(300).optional().default(""),
-  metadata: z.record(z.any()).optional().default({}),
+  metadata: z.record(z.string(), z.any()).optional().default({}),
   occurredAt: z.string().datetime().optional(),
 });
 
@@ -41,4 +41,8 @@ export const notificationPreferencesSchema = z.object({
   weeklyDigestEnabled: z.boolean().optional(),
   weeklyDigestDay: z.coerce.number().int().min(0).max(6).optional(),
   weeklyDigestHour: z.coerce.number().int().min(0).max(23).optional(),
+});
+
+export const subscriptionChangeSchema = z.object({
+  planCode: z.enum(["pro_monthly"]).optional().default("pro_monthly"),
 });
