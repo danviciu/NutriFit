@@ -51,16 +51,21 @@ function resolveConfiguredUrlByEnv() {
     ),
   };
 
-  const configured = byEnv[APP_ENV] || byEnv[MODE] || byEnv.development;
+  const configured = byEnv[APP_ENV] || byEnv[MODE] || "";
   if (configured) return configured;
 
-  // Hard fallback only when no env URL was provided at all.
+  // In production/staging, missing env means "same-origin API" (no localhost leak).
+  if (APP_ENV === "production" || APP_ENV === "staging" || MODE === "production" || MODE === "staging") {
+    return "";
+  }
+
+  // Development keeps localhost fallback.
   return DEFAULT_LOCAL_API_URL;
 }
 
 function resolveApiBaseUrl() {
   const configured = resolveConfiguredUrlByEnv();
-  if (!configured) return DEFAULT_LOCAL_API_URL;
+  if (!configured) return "";
 
   // Explicit override for Android native builds (emulator/device).
   const nativeAndroidOverride = normalizeUrl(
